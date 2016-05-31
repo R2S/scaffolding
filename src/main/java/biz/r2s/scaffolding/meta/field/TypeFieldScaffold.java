@@ -1,0 +1,8 @@
+package biz.r2s.scaffolding.meta.field;
+
+/**
+ * Created by raphael on 24/07/15.
+ */
+public enum TypeFieldScaffold {
+    TEXT, NUMBER, NUMBER_PRECISION, FLOAT, DATE, FILE, CEP, CPF, CNPJ, CELULAR, TELEFONE, HORA, EMAIL, PASSWORD, PLACA_CARRO, REAIS, SELECT2, SELECT2_AJAX, PERIODO, INPUT, CHECKBOX, DATATABLE, HIDDEN, STATIC;
+}

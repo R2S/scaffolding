@@ -10,7 +10,7 @@ import javax.persistence.PersistenceContext;
 import biz.r2s.core.crud.dao.GenericDao;
 import biz.r2s.core.crud.model.BaseModel;
 
-public class GenericDaoEbjImpl<T extends BaseModel<V>, V extends Serializable> implements GenericDao<T, V>{
+public abstract class GenericDaoEbjImpl<T extends BaseModel<V>, V extends Serializable> implements GenericDao<T, V>{
 	
 	@PersistenceContext(unitName = "thePersistenceUnit")
 	private EntityManager entityManager;
@@ -30,6 +30,7 @@ public class GenericDaoEbjImpl<T extends BaseModel<V>, V extends Serializable> i
 		}	
 	}
 	
+	@SuppressWarnings("unchecked")
 	public GenericDaoEbjImpl(boolean changeEntityClass){
 		if(this.entityClass==null&&changeEntityClass){
 			ParameterizedType genericSuperclass = (ParameterizedType) getClass()
@@ -53,10 +54,10 @@ public class GenericDaoEbjImpl<T extends BaseModel<V>, V extends Serializable> i
 
 	@Override
 	public void delete(T t) {
-		this.entityManager.merge(t);
-        this.entityManager.remove(t);		
+		this.entityManager.remove(getEntityManager().contains(t) ? t : getEntityManager().merge(t));		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> listAll() {
 		return (List<T>) this.getEntityManager().createQuery("select o from "+this.entityClass.getName()+" o")

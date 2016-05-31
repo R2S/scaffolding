@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import biz.r2s.core.crud.model.BaseModel;
 import biz.r2s.core.crud.service.GenericService;
 import biz.r2s.core.crud.service.ejb.impl.DefaultServiceEjbImpl;
+import biz.r2s.core.util.ObjectUtil;
 @Path("/{className}")
 public class DefaultControllerEjbImpl extends GenericControllerEjbImpl<BaseModel<Long>, Long>{
 	@PathParam("className") 
@@ -40,7 +41,7 @@ public class DefaultControllerEjbImpl extends GenericControllerEjbImpl<BaseModel
 
 	@Override
 	protected void copyObject(BaseModel<Long> objectDB, BaseModel<Long> objectRequest) {
-				
+		ObjectUtil.copyFieldByField(objectRequest, objectDB);
 	}
 	
 	@POST
