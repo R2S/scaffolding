@@ -13,7 +13,6 @@ public class DefaultDaoEjbImpl<T extends BaseModel<V>, V extends Serializable> e
 		super(false);
 	}
 	public void setEntityClass(Class<T> entityClass) {
-		this.getEntityManager().getMetamodel()
 		this.entityClass = entityClass;
 	}
 }

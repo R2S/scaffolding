@@ -1,11 +1,10 @@
-package br.ufscar.sagui.scaffolding.extractor
+package  biz.r2s.scaffolding.extractor;
 
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import  biz.r2s.scaffolding.meta.ClassScaffold;
 
 /**
  * Created by raphael on 04/08/15.
  */
-interface MetaDomainExtractor {
-    ClassScaffold extractor(GrailsDomainClass domainClass, ClassScaffold classScaffold);
+public interface MetaDomainExtractor {
+    ClassScaffold extractor(Class domainClass, ClassScaffold classScaffold);
 }

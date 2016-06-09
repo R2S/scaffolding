@@ -15,32 +15,44 @@ public class ResourceUrlScaffold {
     Class clazz;
     String propertyName;
 
-    public static ResourceUrlScaffold builder(EntityType entity) {
+    public static ResourceUrlScaffold builder(Class entity) {
     	return builder(entity, null);
     }
-    public static ResourceUrlScaffold builder(EntityType entity, String propertyName = null) {
-        def resource = new ResourceUrlScaffold();
+    public static ResourceUrlScaffold builder(Class entity, String propertyName) {
+    	ResourceUrlScaffold resource = new ResourceUrlScaffold();
         resource.setPropertyName(propertyName);
-        resource.setClazz(entity.getBindableJavaType());
+        resource.setClazz(entity);
         return resource;
     }
 
-    boolean isHasMamy() {
+    public String getPropertyName() {
+		return propertyName;
+	}
+	public void setPropertyName(String propertyName) {
+		this.propertyName = propertyName;
+	}
+	public Class getClazz() {
+		return clazz;
+	}
+	public void setClazz(Class clazz) {
+		this.clazz = clazz;
+	}
+	boolean isHasMamy() {
         return propertyName != null && !propertyName.isEmpty();
     }
-    ResourceUrl resolver(TypeActionScaffold action) {
+    public ResourceUrl resolver(TypeActionScaffold action) {
     	return this.resolver2(action, null);
     }
-    ResourceUrl resolver(TypeActionScaffold action, Object fatherId) {
+    public ResourceUrl resolver(TypeActionScaffold action, Object fatherId) {
         return this.resolverUrl(action, this.getUrlBase(), fatherId);
     }
     
-    ResourceUrl resolver2(TypeActionScaffold action, Object fatherId) {
+    public ResourceUrl resolver2(TypeActionScaffold action, Object fatherId) {
         return this.resolverUrl(action, this.getUrlBase(), fatherId);
     }
 
     public String  getUrlBase() {
-        String url = DomainScaffoldStore.getURLBase(this.clazz, this.propertyName)
+        String url = DomainScaffoldStore.getURLBase(this.clazz, this.propertyName);
         if (url==null) {
             url = this.getGenericUrlBase();
         }
@@ -48,18 +60,18 @@ public class ResourceUrlScaffold {
 
     }
 
-    String getGenericUrlBase() {
+    public String getGenericUrlBase() {
         return this.getGenericUrlBase(clazz, propertyName);
     }
 
-    static String getGenericUrlBase(Class clazz, String propertyName) {
+    public static String getGenericUrlBase(Class clazz, String propertyName) {
         String urlBase =  "/scaffolding/"+clazz.getName();
         if(propertyName!=null)
         	urlBase=urlBase.concat("/(*)/").concat(propertyName);
         return urlBase;
     }
 
-    static String getUrlPath() {
+    public static String getUrlPath() {
         /*try {
             //def webUtils = WebUtils.retrieveGrailsWebRequest()
 
@@ -126,7 +138,7 @@ public class ResourceUrlScaffold {
         return urlStr;
     }
 
-    static HttpMethod getHttpMethod(TypeActionScaffold action) {
+    public static HttpMethod getHttpMethod(TypeActionScaffold action) {
         HttpMethod httpMethod;
         switch (action) {
             case CREATE:

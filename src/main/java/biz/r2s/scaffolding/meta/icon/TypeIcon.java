@@ -6,7 +6,7 @@ package biz.r2s.scaffolding.meta.icon;
 public enum TypeIcon {
     FA, GLYPHICON, SLI;
 
-    static String format(TypeIcon typeIcon, String name){
+    public static String format(TypeIcon typeIcon, String name){
         String iconClass = "";
         if(typeIcon == FA){
             iconClass = "fa fa-".concat(name);

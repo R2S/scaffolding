@@ -1,64 +1,149 @@
-package br.ufscar.sagui.scaffolding.interceptor
+package biz.r2s.scaffolding.interceptor;
 
-import br.ufscar.sagui.scaffolding.meta.ResourceUrlScaffold
-import br.ufscar.sagui.util.GrailsUtil
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.springframework.util.Assert
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import biz.r2s.scaffolding.meta.ResourceUrlScaffold;
+import biz.r2s.scaffolding.meta.icon.IconScaffold;
 
 /**
  * Created by raphael on 17/08/15.
  */
-class DomainResource {
-    String key
-    String url
-    String nomeResource
-    GrailsDomainClass domainClass
-    String propertyName
-    List<String> roles
-    String root
-    String title
-    def icon
-    boolean enabledMenu
+public class DomainResource {
+	String key;
+	String url;
+	String nomeResource;
+	Class domainClass;
+	String propertyName;
+	List<String> roles;
+	String root;
+	String title;
+	IconScaffold icon;
+	boolean enabledMenu;
 
-    boolean isHasMamy() {
-        return propertyName != null && !propertyName.isEmpty()
-    }
+	public boolean isHasMamy() {
+		return propertyName != null && !propertyName.isEmpty();
+	}
 
-    String getUrlGeneric() {
-        ResourceUrlScaffold.getGenericUrlBase(domainClass.clazz, propertyName)
-    }
+	public String getUrlGeneric() {
+		return ResourceUrlScaffold.getGenericUrlBase(domainClass, propertyName);
+	}
 
-    @Override
-    String toString() {
-        return "$domainClass.name $propertyName"
-    }
+	@Override
+	public String toString() {
+		return domainClass.getName() + " " + propertyName;
+	}
 
-    def format() {
-        return formatMenu(this.key, this.title, this.url, this.roles, this.root, this.icon)
-    }
+	public Map<String, Object> format() {
+		return formatMenu(this.key, this.title, this.url, this.roles, this.root, this.icon);
+	}
 
-    static def formatMenu(String key, String name, String url, def rules, String root, def icon) {
-        def menu = [:]
-        menu.key = key
-        menu.url = url
-        menu.name = name
-        menu.roles = rules
-        menu.root = root
-        menu.icon = icon
-        return menu
-    }
+	public static Map<String, Object> formatMenu(String key, String name, String url, List<String> rules, String root,
+			IconScaffold icon) {
+		Map<String, Object> menu = Collections.emptyMap();
+		menu.put("key", key);
+		menu.put("url", url);
+		menu.put("name", name);
+		menu.put("roles", rules);
+		menu.put("root", root);
+		menu.put("icon", icon);
+		return menu;
+	}
 
-    public GrailsDomainClass getDomainClassResourse() {
-        if (propertyName) {
-            GrailsDomainClassProperty classProperty = domainClass.getPropertyByName(propertyName)
-            Assert.notNull(classProperty, "o campos hasMany $propertyName não existe")
-            return classProperty.referencedDomainClass
-        }
-        return domainClass
-    }
+	public Class getDomainClassResourse() {
+		/*
+		 * if (propertyName) { GrailsDomainClassProperty classProperty =
+		 * domainClass.getPropertyByName(propertyName)
+		 * Assert.notNull(classProperty,
+		 * "o campos hasMany $propertyName não existe") return
+		 * classProperty.referencedDomainClass }
+		 */
+		return domainClass;
+	}
 
-    public Class getResourse() {
-        return getDomainClassResourse().clazz
-    }
+	public Class getResourse() {
+		return domainClass;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getNomeResource() {
+		return nomeResource;
+	}
+
+	public void setNomeResource(String nomeResource) {
+		this.nomeResource = nomeResource;
+	}
+
+	public Class getDomainClass() {
+		return domainClass;
+	}
+
+	public void setDomainClass(Class domainClass) {
+		this.domainClass = domainClass;
+	}
+
+	public String getPropertyName() {
+		return propertyName;
+	}
+
+	public void setPropertyName(String propertyName) {
+		this.propertyName = propertyName;
+	}
+
+	public List<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
+
+	public String getRoot() {
+		return root;
+	}
+
+	public void setRoot(String root) {
+		this.root = root;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public IconScaffold getIcon() {
+		return icon;
+	}
+
+	public void setIcon(IconScaffold icon) {
+		this.icon = icon;
+	}
+
+	public boolean isEnabledMenu() {
+		return enabledMenu;
+	}
+
+	public void setEnabledMenu(boolean enabledMenu) {
+		this.enabledMenu = enabledMenu;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 }

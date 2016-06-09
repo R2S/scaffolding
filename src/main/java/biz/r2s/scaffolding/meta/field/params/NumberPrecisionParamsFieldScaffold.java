@@ -16,4 +16,13 @@ public class NumberPrecisionParamsFieldScaffold extends InputParamsFieldScaffold
     public TypeFieldScaffold getType() {
         return TypeFieldScaffold.NUMBER_PRECISION;
     }
+
+	public int getPrecision() {
+		return precision;
+	}
+
+	public void setPrecision(int precision) {
+		this.precision = precision;
+	}
+    
 }

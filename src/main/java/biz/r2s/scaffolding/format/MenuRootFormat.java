@@ -1,24 +1,25 @@
-package br.ufscar.sagui.scaffolding.format
+package biz.r2s.scaffolding.format;
 
-import br.ufscar.sagui.scaffolding.meta.icon.IconScaffold
-import br.ufscar.sagui.scaffolding.meta.icon.PositionIcon
-import br.ufscar.sagui.scaffolding.meta.icon.TypeIcon
-import br.ufscar.sagui.util.I18nUtils
-import grails.util.GrailsNameUtils
+import java.util.List;
+import java.util.Map;
+
+import biz.r2s.scaffolding.meta.icon.IconScaffold;
+import biz.r2s.scaffolding.meta.icon.PositionIcon;
+import biz.r2s.scaffolding.meta.icon.TypeIcon;
 
 /**
  * Created by raphael on 25/09/15.
  */
 class MenuRootFormat {
-    CommonFormat commonFormat
+    CommonFormat commonFormat;
 
-    static messageKeyName = "menu.:name.title"
-    static messageKeyIconName = "menu.:name.icon.name"
-    static messageKeyIconType = "menu.:name.icon.type"
-    static messageKeyIconPosicion = "menu.:name.icon.position"
+    static String messageKeyName = "menu.:name.title";
+    static String messageKeyIconName = "menu.:name.icon.name";
+    static String messageKeyIconType = "menu.:name.icon.type";
+    static String messageKeyIconPosicion = "menu.:name.icon.position";
 
     public MenuRootFormat(){
-        commonFormat = new CommonFormat()
+        commonFormat = new CommonFormat();
     }
     public def formatMenus(List<Map> menus){
         menus.groupBy {it.root}.collect {
@@ -60,17 +61,17 @@ class MenuRootFormat {
 
     TypeIcon getTypeIcon(String typeIcon){
         try{
-            TypeIcon.valueOf(typeIcon.toUpperCase())
+            return TypeIcon.valueOf(typeIcon.toUpperCase());
         }catch (IllegalArgumentException e){
-            return null
+            return null;
         }
     }
 
     PositionIcon getPositionIcon(String typeIcon){
         try{
-            PositionIcon.valueOf(typeIcon.toUpperCase())
+        	return PositionIcon.valueOf(typeIcon.toUpperCase());
         }catch (IllegalArgumentException e){
-            return null
+            return null;
         }
     }
 }

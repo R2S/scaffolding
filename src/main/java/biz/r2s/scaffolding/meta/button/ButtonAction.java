@@ -1,11 +1,13 @@
 package biz.r2s.scaffolding.meta.button;
 
+import biz.r2s.scaffolding.meta.HttpMethod;
+
 /**
  * Created by raphael on 29/07/15.
  */
 public class ButtonAction extends Button{
     String url;
-    String httpMethod;
+    HttpMethod httpMethod;
     Boolean confirmation;
 
     @Override
@@ -21,11 +23,11 @@ public class ButtonAction extends Button{
 		this.url = url;
 	}
 
-	public String getHttpMethod() {
+	public HttpMethod getHttpMethod() {
 		return httpMethod;
 	}
 
-	public void setHttpMethod(String httpMethod) {
+	public void setHttpMethod(HttpMethod httpMethod) {
 		this.httpMethod = httpMethod;
 	}
 

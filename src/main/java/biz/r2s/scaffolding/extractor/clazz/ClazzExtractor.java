@@ -1,69 +1,70 @@
-package br.ufscar.sagui.scaffolding.extractor.clazz
+package  biz.r2s.scaffolding.extractor.clazz;
 
-import br.ufscar.sagui.scaffolding.extractor.MetaDomainExtractor
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.meta.MenuScaffold
-import br.ufscar.sagui.scaffolding.meta.action.ActionsScaffold
-import br.ufscar.sagui.scaffolding.meta.datatatable.DatatableScaffold
-import br.ufscar.sagui.scaffolding.meta.field.FieldScaffold
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import java.util.List;
+
+import  biz.r2s.scaffolding.extractor.MetaDomainExtractor;
+import  biz.r2s.scaffolding.meta.ClassScaffold;
+import  biz.r2s.scaffolding.meta.MenuScaffold;
+import  biz.r2s.scaffolding.meta.action.ActionsScaffold;
+import  biz.r2s.scaffolding.meta.datatatable.DatatableScaffold;
+import  biz.r2s.scaffolding.meta.field.FieldScaffold;
 
 /**
  * Created by raphael on 28/07/15.
  */
-class ClazzExtractor implements MetaDomainExtractor {
+public class ClazzExtractor implements MetaDomainExtractor {
 
-    private ActionsClassExtractor actionsBuilder
-    private FieldClassExtractor fieldBuilder
-    private TitleClassExtractor titleClassBuilder
-    private DatatableClassExtrator datatableClassBuilder
-    private MenuClassExtrator menuClassExtrator
-    private ButtonClassExtrator buttonClassExtrator
+    private ActionsClassExtractor actionsBuilder;
+    private FieldClassExtractor fieldBuilder;
+    private TitleClassExtractor titleClassBuilder;
+    private DatatableClassExtrator datatableClassBuilder;
+    private MenuClassExtrator menuClassExtrator;
+    private ButtonClassExtrator buttonClassExtrator;
 
     public ClazzExtractor() {
-        actionsBuilder = new ActionsClassExtractor()
-        fieldBuilder = new FieldClassExtractor()
-        titleClassBuilder = new TitleClassExtractor()
-        datatableClassBuilder = new DatatableClassExtrator()
-        menuClassExtrator = new MenuClassExtrator()
-        buttonClassExtrator = new ButtonClassExtrator()
+        actionsBuilder = new ActionsClassExtractor();
+        fieldBuilder = new FieldClassExtractor();
+        titleClassBuilder = new TitleClassExtractor();
+        datatableClassBuilder = new DatatableClassExtrator();
+        menuClassExtrator = new MenuClassExtrator();
+        buttonClassExtrator = new ButtonClassExtrator();
     }
 
-    ClassScaffold extractor(GrailsDomainClass domainClass, ClassScaffold classScaffold) {
-        if (!classScaffold) {
-            classScaffold = new ClassScaffold()
+    public ClassScaffold extractor(Class domainClass, ClassScaffold classScaffold) {
+        if (classScaffold==null) {
+            classScaffold = new ClassScaffold();
         }
-        classScaffold.clazz = domainClass.clazz
-        classScaffold.name = this.getName(domainClass)
-        classScaffold.title = titleClassBuilder.getTitle(domainClass)
-        classScaffold.actions = this.getActions(domainClass, classScaffold)
-        classScaffold.fields = this.getFields(domainClass, classScaffold)
-        classScaffold.datatable = this.getDatatable(domainClass, classScaffold)
-        classScaffold.menu = this.getMenu(domainClass, classScaffold)
-        classScaffold.buttons = buttonClassExtrator.getButtons(domainClass, classScaffold)
-        return classScaffold
+        classScaffold.setClazz(domainClass);
+        classScaffold.setName(this.getName(domainClass));
+        classScaffold.setTitle(titleClassBuilder.getTitle(domainClass));
+        classScaffold.setActions(this.getActions(domainClass, classScaffold));
+        classScaffold.setFields(this.getFields(domainClass, classScaffold));
+        classScaffold.setDatatable(this.getDatatable(domainClass, classScaffold));
+        classScaffold.setMenu(this.getMenu(domainClass, classScaffold));
+        classScaffold.setButtons(buttonClassExtrator.getButtons(domainClass, classScaffold));
+        return classScaffold;
     }
 
-    private DatatableScaffold getDatatable(GrailsDomainClass domainClass, ClassScaffold classScaffold) {
-        DatatableScaffold datatableScaffold = new DatatableScaffold()
-        datatableClassBuilder.initDatatableDefault(datatableScaffold, domainClass)
-        datatableScaffold.parent = classScaffold
-        return datatableScaffold
+    private DatatableScaffold getDatatable(Class domainClass, ClassScaffold classScaffold) {
+        DatatableScaffold datatableScaffold = new DatatableScaffold();
+        datatableClassBuilder.initDatatableDefault(datatableScaffold, domainClass);
+        datatableScaffold.setParent(classScaffold);
+        return datatableScaffold;
     }
 
-    String getName(GrailsDomainClass domainClass) {
-        return domainClass.naturalName
+    String getName(Class domainClass) {
+        return domainClass.getName();
     }
 
-    ActionsScaffold getActions(GrailsDomainClass domainClass, ClassScaffold classScaffold) {
-        return actionsBuilder.getActions(domainClass, classScaffold)
+    ActionsScaffold getActions(Class domainClass, ClassScaffold classScaffold) {
+        return actionsBuilder.getActions(domainClass);
     }
 
-    List<FieldScaffold> getFields(GrailsDomainClass domainClass, ClassScaffold classScaffold) {
-        return fieldBuilder.getFields(domainClass, classScaffold)
+    List<FieldScaffold> getFields(Class domainClass, ClassScaffold classScaffold) {
+        return fieldBuilder.getFields(domainClass, classScaffold);
     }
 
-    MenuScaffold getMenu(GrailsDomainClass domainClass, ClassScaffold classScaffold){
-        return menuClassExtrator.getMenu(domainClass, classScaffold)
+    MenuScaffold getMenu(Class domainClass, ClassScaffold classScaffold){
+        return menuClassExtrator.getMenu(domainClass);
     }
 }

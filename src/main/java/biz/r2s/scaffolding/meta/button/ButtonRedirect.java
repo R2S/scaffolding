@@ -7,7 +7,7 @@ public class ButtonRedirect extends Button{
     String rota;
 
     @Override
-    ButtonType getType() {
+    public ButtonType getType() {
         return ButtonType.REDIRECT;
     }
 

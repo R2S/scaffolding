@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import biz.r2s.core.util.ObjectUtil;
 import biz.r2s.scaffolding.meta.field.FieldScaffold;
 import biz.r2s.scaffolding.meta.field.TypeFieldScaffold;
 
@@ -55,13 +56,13 @@ public class InputParamsFieldScaffold implements ParamsFieldScaffold {
     @Override
     public Map<String, Object> format() {
     	Map<String, Object>  meta = new HashMap<String, Object>();
-        /*this.campos.each {
-            if(it == "mask"){
-                meta."sagui-mask" = this."$it"
+        for(String campo: this.campos){
+        	if(campo == "mask"){
+                meta.put("sagui-mask", ObjectUtil.getValue(campo, this));
             }else{
-                meta."$it" = this."$it"
+            	meta.put(campo, ObjectUtil.getValue(campo, this));
             }
-        }*/
+        }
         return meta;
     }
 

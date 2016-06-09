@@ -16,19 +16,19 @@ public class ClassScaffold {
     String name;
     TitleScaffold title;
     ActionsScaffold actions;
-    ArrayList<FieldScaffold> fields;
+    List<FieldScaffold> fields;
     PermissionClass permission;
     DatatableScaffold datatable;
     StatusClassScaffold status;
     Class clazz;
     MenuScaffold menu;
-    ArrayList<String> transiendsShow;
+    List<String> transiendsShow;
     String serviceClass;
     String controllerClass;
-    ArrayList<Button> buttons;
+    List<Button> buttons;
     boolean isHasMany;
 
-    void setStatus(StatusClassScaffold status){
+    public void setStatus(StatusClassScaffold status){
         this.status = status;
     }
 
@@ -66,11 +66,11 @@ public class ClassScaffold {
 		this.actions = actions;
 	}
 
-	public ArrayList<FieldScaffold> getFields() {
+	public List<FieldScaffold> getFields() {
 		return fields;
 	}
 
-	public void setFields(ArrayList<FieldScaffold> fields) {
+	public void setFields(List<FieldScaffold> fields) {
 		this.fields = fields;
 	}
 
@@ -106,11 +106,11 @@ public class ClassScaffold {
 		this.menu = menu;
 	}
 
-	public ArrayList<String> getTransiendsShow() {
+	public List<String> getTransiendsShow() {
 		return transiendsShow;
 	}
 
-	public void setTransiendsShow(ArrayList<String> transiendsShow) {
+	public void setTransiendsShow(List<String> transiendsShow) {
 		this.transiendsShow = transiendsShow;
 	}
 
@@ -130,11 +130,11 @@ public class ClassScaffold {
 		this.controllerClass = controllerClass;
 	}
 
-	public ArrayList<Button> getButtons() {
+	public List<Button> getButtons() {
 		return buttons;
 	}
 
-	public void setButtons(ArrayList<Button> buttons) {
+	public void setButtons(List<Button> buttons) {
 		this.buttons = buttons;
 	}
 

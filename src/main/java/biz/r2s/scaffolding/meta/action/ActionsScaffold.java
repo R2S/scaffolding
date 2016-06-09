@@ -86,7 +86,7 @@ public class ActionsScaffold {
         return actionScaffold;
     }
 
-    static String getNameAction(TypeActionScaffold typeActionScaffold) {
+    public static String getNameAction(TypeActionScaffold typeActionScaffold) {
 
         String actionScaffold;
         switch (typeActionScaffold) {

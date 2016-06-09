@@ -7,8 +7,8 @@ import biz.r2s.scaffolding.meta.field.TypeFieldScaffold;
  */
 public class PasswordParamsFieldScaffold extends InputParamsFieldScaffold {
 
-    @Override
-public TypeFieldScaffold getType() {
-        return TypeFieldScaffold.PASSWORD;
-    }
+	@Override
+	public TypeFieldScaffold getType() {
+		return TypeFieldScaffold.PASSWORD;
+	}
 }

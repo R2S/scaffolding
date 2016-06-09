@@ -1,87 +1,97 @@
-package br.ufscar.sagui.scaffolding.extractor.scaffolding
+package biz.r2s.scaffolding.extractor.scaffolding;
 
-import br.ufscar.sagui.scaffolding.meta.ResourceUrlScaffold
-import br.ufscar.sagui.scaffolding.meta.field.FieldScaffold
-import br.ufscar.sagui.scaffolding.meta.field.TypeFieldScaffold
-import br.ufscar.sagui.scaffolding.meta.field.params.DataTableParamsFieldScaffold
-import br.ufscar.sagui.scaffolding.meta.field.params.ParamsFactory
-import br.ufscar.sagui.scaffolding.meta.field.params.ParamsFieldScaffold
-import br.ufscar.sagui.scaffolding.meta.field.params.Select2AjaxParamsFieldScaffold
-import br.ufscar.sagui.util.GrailsUtil
+import java.lang.reflect.Field;
+import java.util.Map;
+
+import biz.r2s.core.util.ObjectUtil;
+import biz.r2s.scaffolding.meta.ResourceUrlScaffold;
+import biz.r2s.scaffolding.meta.field.FieldScaffold;
+import biz.r2s.scaffolding.meta.field.TypeFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.DataTableParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.ParamsFactory;
+import biz.r2s.scaffolding.meta.field.params.ParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.Select2AjaxParamsFieldScaffold;
 
 /**
  * Created by raphael on 06/08/15.
  */
-class ParamsScaffoldingExtrator {
+public class ParamsScaffoldingExtrator {
 
-    DataTableScaffoldingExtrator dataTableScaffoldingExtrator
-    ActionsScaffoldingExtrator actionsScaffoldingExtrator
+	DataTableScaffoldingExtrator dataTableScaffoldingExtrator;
+	ActionsScaffoldingExtrator actionsScaffoldingExtrator;
 
-    public ParamsScaffoldingExtrator() {
-        dataTableScaffoldingExtrator = new DataTableScaffoldingExtrator()
-        actionsScaffoldingExtrator = new ActionsScaffoldingExtrator()
+	public ParamsScaffoldingExtrator() {
+        dataTableScaffoldingExtrator = new DataTableScaffoldingExtrator();
+        actionsScaffoldingExtrator = new ActionsScaffoldingExtrator();
     }
+	
+	void copyParams(ParamsFieldScaffold origem, ParamsFieldScaffold destino){
+		//TODO:FAZER
+	}
 
-    void changeTypeAndParamsFields(def fieldScaffolding, FieldScaffold fieldScaffold) {
-        TypeFieldScaffold type = this.getType(fieldScaffolding)
-        def paramsConfig = this.getParams(fieldScaffolding)
-        if (type) {
-            fieldScaffold.type = type
-            ParamsFieldScaffold params = ParamsFactory.factory(type)
-            if (fieldScaffold.type == TypeFieldScaffold.SELECT2_AJAX) {
-                def domain = GrailsUtil.getDomainClass(fieldScaffold.parent.clazz)
-                ((Select2AjaxParamsFieldScaffold)params).resourceUrl = ResourceUrlScaffold.builder(domain.getPropertyByName(fieldScaffold.key)?.referencedDomainClass,null)
+	public void changeTypeAndParamsFields(Map fieldScaffolding, FieldScaffold fieldScaffold) throws Exception {
+        TypeFieldScaffold type = this.getType(fieldScaffolding);
+        Map<String, Object> paramsConfig = this.getParams(fieldScaffolding);
+        if (type != null) {
+            fieldScaffold.setType(type);
+            ParamsFieldScaffold params = ParamsFactory.factory(type);
+            if (fieldScaffold.getType() == TypeFieldScaffold.SELECT2_AJAX) {
+                Class domain = fieldScaffold.getParent().getClazz();
+                Field field = ObjectUtil.getField(fieldScaffold.getKey(), domain);
+                		if(field!=null){
+                ((Select2AjaxParamsFieldScaffold)params).setResourceUrl(ResourceUrlScaffold.builder(field.getType(),null));
+                		}
             }
-            if (!fieldScaffold.params.class.equals(params.class)) {
-                params.properties.putAll(fieldScaffold.params.properties)
-                fieldScaffold.params = params
+            if (!fieldScaffold.getParams().getClass().equals(params.getClass())) {
+            	copyParams(params, fieldScaffold.getParams());
             }
         }
 
-        if (paramsConfig) {
-            if (fieldScaffold.type == TypeFieldScaffold.DATATABLE) {
-                DataTableParamsFieldScaffold dataTableParamsFieldScaffold = fieldScaffold.params
+        if (paramsConfig!=null) {
+            if (fieldScaffold.getType() == TypeFieldScaffold.DATATABLE) {
+                DataTableParamsFieldScaffold dataTableParamsFieldScaffold = (DataTableParamsFieldScaffold) fieldScaffold.getParams();
 
-                actionsScaffoldingExtrator.changeActions(paramsConfig, dataTableParamsFieldScaffold.actions)
-                dataTableScaffoldingExtrator.changeDatatable(paramsConfig, dataTableParamsFieldScaffold)
-                dataTableParamsFieldScaffold.aplicarActions()
-            } else if (fieldScaffold.params.validate(paramsConfig)) {
-                paramsConfig.each {key, value ->
-                    fieldScaffold.params."$key" = value
-                }
+                actionsScaffoldingExtrator.changeActions(paramsConfig, dataTableParamsFieldScaffold.getActions());
+                dataTableScaffoldingExtrator.changeDatatable(paramsConfig, dataTableParamsFieldScaffold);
+                //dataTableParamsFieldScaffold.aplicarActions();
+            } else if (fieldScaffold.getParams().validate(paramsConfig)) {
+            	for(String key: paramsConfig.keySet()){
+            		Object value = paramsConfig.get(key);
+            		ObjectUtil.copyFieldValue(value, fieldScaffold.getParams(), ObjectUtil.getField(key, fieldScaffold.getParams().getClass()));
+            	}            	
             } else {
-                throw new Exception("Parametros invalidos " + fieldScaffold.key)
+                throw new Exception("Parametros invalidos " + fieldScaffold.getKey());
             }
 
         }
     }
 
-    TypeFieldScaffold getType(fieldScaffolding) {
-        def type = fieldScaffolding.get("type")
-        TypeFieldScaffold typeFieldScaffold = null
-        if (type) {
-            typeFieldScaffold = this.converterParaEnum(type)
-        }
-        return typeFieldScaffold
-    }
+	TypeFieldScaffold getType(Map fieldScaffolding) throws Exception {
+		String type = (String) fieldScaffolding.get("type");
+		TypeFieldScaffold typeFieldScaffold = null;
+		if (type != null) {
+			typeFieldScaffold = this.converterParaEnum(type);
+		}
+		return typeFieldScaffold;
+	}
 
-    def getParams(fieldScaffolding) {
-        fieldScaffolding.get("params")
-    }
+	Map getParams(Map fieldScaffolding) {
+		return (Map) fieldScaffolding.get("params");
+	}
 
-    TypeFieldScaffold converterParaEnum(def type) {
-        if (!(type instanceof TypeFieldScaffold)) {
-            try{
-                if (type instanceof String) {
-                    return TypeFieldScaffold.valueOf(type.toUpperCase())
-                } else {
-                    throw new Exception("TypeFieldScaffold invalido")
-                }
-            }catch (e){
-                throw new Exception("TypeFieldScaffold invalido")
-            }
-        }
-    }
-
+	TypeFieldScaffold converterParaEnum(Object type) throws Exception {
+		if (!(type instanceof TypeFieldScaffold)) {
+			try {
+				if (type instanceof String) {
+					return TypeFieldScaffold.valueOf(((String) type).toUpperCase());
+				} else {
+					throw new Exception("TypeFieldScaffold invalido");
+				}
+			} catch (Exception e) {
+				throw new Exception("TypeFieldScaffold invalido");
+			}
+		}
+		return null;
+	}
 
 }

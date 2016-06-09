@@ -1,96 +1,110 @@
-package br.ufscar.sagui.scaffolding.extractor.scaffolding
+package  biz.r2s.scaffolding.extractor.scaffolding;
 
-import br.ufscar.sagui.scaffolding.extractor.clazz.ActionsClassExtractor
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.meta.TitleScaffold
-import br.ufscar.sagui.scaffolding.meta.action.ActionScaffold
-import br.ufscar.sagui.scaffolding.meta.action.ActionsScaffold
-import br.ufscar.sagui.scaffolding.meta.action.TypeActionScaffold
-import br.ufscar.sagui.scaffolding.meta.security.PermissionAction
+import java.util.List;
+import java.util.Map;
+
+import  biz.r2s.scaffolding.extractor.clazz.ActionsClassExtractor;
+import  biz.r2s.scaffolding.meta.ClassScaffold;
+import  biz.r2s.scaffolding.meta.TitleScaffold;
+import  biz.r2s.scaffolding.meta.action.ActionScaffold;
+import  biz.r2s.scaffolding.meta.action.ActionsScaffold;
+import  biz.r2s.scaffolding.meta.action.TypeActionScaffold;
+import  biz.r2s.scaffolding.meta.security.PermissionAction;
 
 /**
  * Created by raphael on 06/08/15.
  */
-class ActionsScaffoldingExtrator {
-    TitleScaffoldingExtrator titleScaffoldingExtrator
-    PermissionScaffoldingExtrator permissionScaffoldingExtrator
+public class ActionsScaffoldingExtrator {
+    TitleScaffoldingExtrator titleScaffoldingExtrator;
+    PermissionScaffoldingExtrator permissionScaffoldingExtrator;
 
     public ActionsScaffoldingExtrator() {
-        titleScaffoldingExtrator = new TitleScaffoldingExtrator()
-        permissionScaffoldingExtrator = new PermissionScaffoldingExtrator()
+        titleScaffoldingExtrator = new TitleScaffoldingExtrator();
+        permissionScaffoldingExtrator = new PermissionScaffoldingExtrator();
     }
 
-    void changeActions(def classScaffolding, ClassScaffold classScaffold) {
-        changeActions(classScaffolding, classScaffold.actions)
+    void changeActions(Map<String, Object> classScaffolding, ClassScaffold classScaffold) {;
+        changeActions(classScaffolding, classScaffold.getActions());
     }
 
-    void changeActions(def classScaffolding, ActionsScaffold actionsScaffold) {
-        def actionsValue = classScaffolding.get("actions")
-        if (actionsValue) {
+    void changeActions(Map<String, Object> classScaffolding, ActionsScaffold actionsScaffold) {
+    	Object actionsValue = classScaffolding.get("actions");
+        if (actionsValue!=null) {
             if (actionsValue instanceof List) {
-                actionsValue.each { actionName ->
-                    ActionScaffold actionScaffold = actionsScaffold."$actionName"
-                    if (actionScaffold) {
-                        actionScaffold.parent = actionsScaffold
-                        actionsScaffold."$actionName" = actionScaffold
-                    }
-                }
+            	List<String> actionsValueList = (List<String>) actionsValue;
+            	for(String actionName:actionsValueList){
+            		ActionScaffold actionScaffold = actionsScaffold.getAction(TypeActionScaffold.valueOf(actionName.toUpperCase()));
+                            if (actionScaffold!=null) {
+                                actionScaffold.setParent(actionsScaffold); 
+                                //actionsScaffold."$actionName" = actionScaffold
+                            }
+            	}                
             } else if (actionsValue instanceof Map) {
-                actionsValue.each { actionName, value ->
-                    ActionScaffold actionScaffold = actionsScaffold."$actionName"
-                    if (value instanceof String) {
-                        TitleScaffold titleScaffold = new TitleScaffold()
-                        titleScaffold.name = value
-                        actionScaffold.title = titleScaffold
-                    }else
-                    if (value instanceof Boolean ) {
-                        actionScaffold.enabled = value
-                    } else if (value instanceof Map) {
-                        this.changeTitle(value, actionScaffold)
-                        this.changePermission(value, actionScaffold)
-                        this.changeEnabled(value, actionScaffold)
-                    }
-                    if (actionScaffold) {
-                        actionScaffold.parent = actionsScaffold
-                        actionsScaffold."$actionName" = actionScaffold
-                    }
-                }
+            	Map<String, Object> actionsValueMap = (Map) actionsValue;
+            	for(String key:actionsValueMap.keySet()){
+            		Object value= actionsValueMap.get(key);
+            		ActionScaffold actionScaffold = actionsScaffold.getAction(TypeActionScaffold.valueOf(key.toUpperCase()));
+                            if (value instanceof String) {
+                                TitleScaffold titleScaffold = new TitleScaffold();
+                                titleScaffold.setName((String) value); 
+                                actionScaffold.setTitle(titleScaffold);
+                            }else
+                            if (value instanceof Boolean ) {
+                                actionScaffold.setEnabled((boolean) value);
+                            } else if (value instanceof Map) {
+                            	Map<String, Object> valueMap = (Map<String, Object>) value;
+                                this.changeTitle(valueMap, actionScaffold);
+                                this.changePermission(valueMap, actionScaffold);
+                                this.changeEnabled(valueMap, actionScaffold);
+                            }
+                            if (actionScaffold!=null) {
+                                actionScaffold.setParent(actionsScaffold);
+                                //actionsScaffold."$actionName" = actionScaffold
+                            }
+            	}
             }
         }
     }
 
     ActionScaffold getActionDefault(String actionName, ActionsScaffold actionsScaffold) {
-        ActionScaffold actionScaffold = null
-        ActionsClassExtractor actionsClassExtractor = new ActionsClassExtractor()
-        TypeActionScaffold typeActionScaffold = actionsClassExtractor.actionsToName.find { it.value == actionName }?.key
-        if (typeActionScaffold) {
-            actionScaffold = actionsClassExtractor.getAction(null, typeActionScaffold, actionsScaffold)
+        ActionScaffold actionScaffold = null;
+        ActionsClassExtractor actionsClassExtractor = new ActionsClassExtractor();
+        TypeActionScaffold typeActionScaffold = null;
+        for(TypeActionScaffold typeActionScaffoldkey:actionsClassExtractor.actionsToName.keySet()){
+        	if(actionsClassExtractor.actionsToName.get(typeActionScaffoldkey) == actionName ){
+        		typeActionScaffold = typeActionScaffoldkey;
+        	}
         }
-        return actionScaffold
+        if (typeActionScaffold!=null) {
+            actionScaffold = actionsClassExtractor.getAction(null, typeActionScaffold, actionsScaffold);
+        }
+        return actionScaffold;
     }
 
-    void changeTitle(def actionScaffolding, ActionScaffold actionScaffold) {
-        TitleScaffold titleScaffold = titleScaffoldingExtrator.getTitle(actionScaffolding)
-        if (titleScaffold) {
-            actionScaffold.title = titleScaffold
+    public void changeTitle(Map<String, Object> actionScaffolding, ActionScaffold actionScaffold) {
+        TitleScaffold titleScaffold = titleScaffoldingExtrator.getTitle(actionScaffolding);
+        if (titleScaffold!=null) {
+            actionScaffold.setTitle(titleScaffold);
         }
     }
 
-    void changePermission(def actionScaffolding, ActionScaffold actionScaffold){
-        def permissionScaffolding = actionScaffolding.get("permission")
-        if(permissionScaffolding) {
-            if(!actionScaffold.permission) {
-                actionScaffold.permission = new PermissionAction(actionScaffold: actionScaffold)
+    public void changePermission(Map<String, Object> actionScaffolding, ActionScaffold actionScaffold){
+    	Map<String, Object> permissionScaffolding = (Map<String, Object>) actionScaffolding.get("permission");
+        if(permissionScaffolding!=null) {
+            if(actionScaffold.getPermission()==null) {
+            	PermissionAction permissionAction = new PermissionAction();
+            	permissionAction.setActionScaffold(actionScaffold);
+                actionScaffold.setPermission(permissionAction); 
             }
-            permissionScaffoldingExtrator.changePermission(permissionScaffolding, actionScaffold.permission)
+            permissionScaffoldingExtrator.changePermission(permissionScaffolding, actionScaffold.getPermission());
         }
 
     }
 
-    void changeEnabled(def actionScaffolding, ActionScaffold actionScaffold){
-        def enabledAction = actionScaffolding.get("enabled")
+    public void changeEnabled(Map<String, Object> actionScaffolding, ActionScaffold actionScaffold){
+        Boolean enabledAction = (Boolean) actionScaffolding.get("enabled");
         if(enabledAction!=null) {
-            actionScaffold.enabled = enabledAction
+            actionScaffold.setEnabled(enabledAction);
         }
     }
 }

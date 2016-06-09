@@ -1,21 +1,24 @@
-package br.ufscar.sagui.scaffolding.format
+package biz.r2s.scaffolding.format;
 
-import br.ufscar.sagui.scaffolding.meta.MenuScaffold
+import java.util.Collections;
+import java.util.Map;
+
+import biz.r2s.scaffolding.meta.MenuScaffold;
 
 /**
  * Created by raphael on 25/09/15.
  */
-class MenuFormat {
-    CommonFormat commonFormat
+public class MenuFormat {
+    CommonFormat commonFormat;
     public MenuFormat(){
-        commonFormat = new CommonFormat()
+        commonFormat = new CommonFormat();
     }
 
-    def formatMenu(MenuScaffold menuScaffold){
-        def meta = [:]
-        meta.root = menuScaffold.root
-        meta.title = commonFormat.formatTitle(menuScaffold.title)
-        meta.icon = commonFormat.formatIcon(menuScaffold.icon)
-        return meta
+    public Map formatMenu(MenuScaffold menuScaffold){
+        Map meta = Collections.emptyMap();
+        meta.put("root", menuScaffold.getRoot());
+        meta.put("title", commonFormat.formatTitle(menuScaffold.getTitle()));
+        meta.put("icon", commonFormat.formatIcon(menuScaffold.getIcon()));
+        return meta;
     }
 }

@@ -1,73 +1,76 @@
-package br.ufscar.sagui.scaffolding.extractor.scaffolding
+package biz.r2s.scaffolding.extractor.scaffolding;
 
-import br.ufscar.sagui.scaffolding.meta.action.TypeActionScaffold
-import br.ufscar.sagui.scaffolding.meta.security.Permission
-import br.ufscar.sagui.scaffolding.meta.security.PermissionField
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import biz.r2s.scaffolding.meta.action.TypeActionScaffold;
+import biz.r2s.scaffolding.meta.security.Permission;
+import biz.r2s.scaffolding.meta.security.PermissionField;
 
 /**
  * Created by raphael on 26/08/15.
  */
 class PermissionScaffoldingExtrator {
 
-    def actionsField = ["create", "edit", "show"]
+    List<String> actionsField = Arrays.asList("create", "edit", "show");
 
-    void changePermissionField(def permissionScaffolding, PermissionField permissionField){
-        if(permissionScaffolding){
+    void changePermissionField(Map<String,Object> permissionScaffolding, PermissionField permissionField){
+        if(permissionScaffolding!=null){
             if(permissionScaffolding instanceof Map){
-                permissionScaffolding.each {key, value ->
-                    if(key in actionsField){
-                        TypeActionScaffold  typeActionScaffold =  getActionPermission(key)
-                        List<String> roles = getRoles(value)
-                        permissionField.actionRoles.put(typeActionScaffold, roles)
+            	for(String key: permissionScaffolding.keySet()){
+            		Object value = permissionScaffolding.get(key);
+            		if(actionsField.contains(key)){
+                        TypeActionScaffold  typeActionScaffold =  getActionPermission(key);
+                        List<String> roles = getRoles(value);
+                        permissionField.getActionRoles().put(typeActionScaffold, roles);
                     }
-                }
+            		
+            	}
             }
-            this.changePermission(permissionScaffolding, permissionField)
+            this.changePermission(permissionScaffolding, permissionField);
         }
     }
 
-    private TypeActionScaffold getActionPermission(key) {
-        TypeActionScaffold typeActionScaffold
+    private TypeActionScaffold getActionPermission(String key) {
+        TypeActionScaffold typeActionScaffold = null;
         switch (key) {
             case "create":
-                typeActionScaffold = TypeActionScaffold.CREATE
+                typeActionScaffold = TypeActionScaffold.CREATE;
                 break;
             case "edit":
-                typeActionScaffold = TypeActionScaffold.EDIT
+                typeActionScaffold = TypeActionScaffold.EDIT;
                 break;
             case "show":
-                typeActionScaffold = TypeActionScaffold.VIEW
+                typeActionScaffold = TypeActionScaffold.VIEW;
                 break;
         }
-        return typeActionScaffold
+        return typeActionScaffold;
     }
 
 
-    void changePermission(def permissionScaffolding, Permission permission){
-        if(permissionScaffolding){
+    void changePermission(Map<String, Object> permissionScaffolding, Permission permission){
+        if(permissionScaffolding != null){
             if(permissionScaffolding instanceof Map){
-                def permissionRolesScaffolding = permissionScaffolding.get("roles")
-                if(permissionRolesScaffolding){
-                    permission.roles = this.getRoles(permissionRolesScaffolding)
-                }
-                def permissionAclScaffolding = permissionScaffolding.get("acl")
-                if(permissionAclScaffolding){
-                    permission.acl = permissionAclScaffolding
-                }
+                Object permissionRolesScaffolding = permissionScaffolding.get("roles");
+                if(permissionRolesScaffolding != null){
+                    permission.setRoles(this.getRoles(permissionRolesScaffolding));
+                }                
             }else{
-                permission.roles = this.getRoles(permissionScaffolding)
-                permission.acl = false
+                permission.setRoles(this.getRoles(permissionScaffolding));                
             }
         }
     }
 
-    List getRoles(def permissionRolesScaffolding){
-        def roles = []
+    List<String> getRoles(Object permissionRolesScaffolding){
+    	List<String> roles = Collections.emptyList();
         if(permissionRolesScaffolding instanceof String){
-            roles << permissionRolesScaffolding
+            roles.add((String) permissionRolesScaffolding);
         }else if(permissionRolesScaffolding instanceof List){
-            roles.addAll(permissionRolesScaffolding)
+            roles.addAll((Collection<? extends String>) permissionRolesScaffolding);
         }
-        return roles
+        return roles;
     }
 }

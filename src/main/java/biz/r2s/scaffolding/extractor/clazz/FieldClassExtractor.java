@@ -1,119 +1,127 @@
-package br.ufscar.sagui.scaffolding.extractor.clazz
+package  biz.r2s.scaffolding.extractor.clazz;
 
-import br.ufscar.sagui.core.SaguiArquivo
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.meta.ResourceUrlScaffold
-import br.ufscar.sagui.scaffolding.meta.action.ActionsScaffold
-import br.ufscar.sagui.scaffolding.meta.field.FieldScaffold
-import br.ufscar.sagui.scaffolding.meta.field.TypeFieldScaffold
-import br.ufscar.sagui.scaffolding.meta.field.params.*
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import  biz.r2s.scaffolding.meta.ClassScaffold;
+import  biz.r2s.scaffolding.meta.action.ActionsScaffold;
+import  biz.r2s.scaffolding.meta.field.FieldScaffold;
+import  biz.r2s.scaffolding.meta.field.TypeFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.CheckboxParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.DateParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.FileParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.InputParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.NumberParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.NumberPrecisionParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.ParamsFieldScaffold;
+import biz.r2s.scaffolding.meta.field.params.Select2ParamsFieldScaffold;
 
 /**
  * Created by raphael on 28/07/15.
  */
 class FieldClassExtractor {
 
-    static FIELD_HIDDEN = ["id", "version"]
+    private DatatableClassExtrator datatableClassBuilder = new DatatableClassExtrator();
 
-    private DatatableClassExtrator datatableClassBuilder = new DatatableClassExtrator()
+    private ActionsClassExtractor actionsClassBuilder = new ActionsClassExtractor();
 
-    private ActionsClassExtractor actionsClassBuilder = new ActionsClassExtractor()
-
-    List<FieldScaffold> getFields(GrailsDomainClass domainClass, ClassScaffold classScaffold) {
-        List<FieldScaffold> fields = []
-        def properties = domainClass.getProperties()
-        for (int i = 0; i< properties.size(); i++) {
-            fields << this.getFieldScaffold(properties[i], classScaffold, i+1000)
+    List<FieldScaffold> getFields(Class domainClass, ClassScaffold classScaffold) {
+        List<FieldScaffold> fieldScaffolds = Collections.EMPTY_LIST;
+        int count = 0;
+        for (Field field: domainClass.getFields()) {
+        	count++;
+        	fieldScaffolds.add(this.getFieldScaffold(field, classScaffold, count+1000));
         }
-        return fields
+        return fieldScaffolds;
     }
 
-    FieldScaffold getFieldScaffold(GrailsDomainClassProperty property, ClassScaffold classScaffold, def order) {
-        FieldScaffold fieldScaffold = new FieldScaffold()
+    FieldScaffold getFieldScaffold(Field field, ClassScaffold classScaffold, int order) {
+        FieldScaffold fieldScaffold = new FieldScaffold();
 
-        GrailsDomainClass grailsClass = property.getDomainClass()
+        Class grailsClass = field.getDeclaringClass();
 
-        fieldScaffold.key = property.name
-        fieldScaffold.elementId = this.getId(grailsClass, property)
-        fieldScaffold.label = property.naturalName
-        fieldScaffold.insertable = true
-        fieldScaffold.updateable = true
-        def typeAndParams = this.getTypeAndParams(property, fieldScaffold)
-        fieldScaffold.type = typeAndParams.type
-        fieldScaffold.params = typeAndParams.params
-        fieldScaffold.scaffold = true
-        fieldScaffold.parent = classScaffold
-        fieldScaffold.order = order
-        fieldScaffold.clazzType = property.type
-        fieldScaffold.bidirecional = property.bidirectional
-        fieldScaffold.transients = !property.persistent
-        return fieldScaffold
+        fieldScaffold.setKey(field.getName());
+        fieldScaffold.setElementId(this.getId(grailsClass, field));
+        fieldScaffold.setLabel(field.getName());
+        fieldScaffold.setInsertable(true);
+        fieldScaffold.setUpdateable(true);
+        this.changeTypeAndParams(field, fieldScaffold);
+        fieldScaffold.setScaffold(true);
+        fieldScaffold.setParent(classScaffold);
+        fieldScaffold.setOrder(order);
+        fieldScaffold.setClazzType(grailsClass);
+        fieldScaffold.setBidirecional(false);
+        fieldScaffold.setTransients(false);
+        return fieldScaffold;
 
     }
 
-    String getId(GrailsDomainClass grailsClass, GrailsDomainClassProperty property) {
-        return "${grailsClass.name}.${property.name}"
+    String getId(Class grailsClass, Field field) {
+        return grailsClass.getName()+"."+field.getName();
     }
 
-    def getTypeAndParams(GrailsDomainClassProperty property, FieldScaffold fieldScaffold) {
-        TypeFieldScaffold typeFieldScaffold = TypeFieldScaffold.INPUT
-        ParamsFieldScaffold paramsFieldScaffold = new InputParamsFieldScaffold()
-        paramsFieldScaffold.setRequired(true)
-        Class clazz = property.type
-        if(property.name in FIELD_HIDDEN){
-            typeFieldScaffold = TypeFieldScaffold.HIDDEN
-            paramsFieldScaffold = new HiddenParamsFieldScaffold()
-            paramsFieldScaffold.setRequired(true)
-        }else if (clazz.isAssignableFrom(Number.class)) {
-            if (clazz in [Double, Float, BigDecimal]) {
-                typeFieldScaffold = TypeFieldScaffold.NUMBER_PRECISION
-                paramsFieldScaffold = new NumberPrecisionParamsFieldScaffold()
-                paramsFieldScaffold.setRequired(true)
-                paramsFieldScaffold.setPrecision(3)
+    void changeTypeAndParams(Field field, FieldScaffold fieldScaffold) {
+        TypeFieldScaffold typeFieldScaffold = TypeFieldScaffold.INPUT;
+        ParamsFieldScaffold paramsFieldScaffold = new InputParamsFieldScaffold();
+        ((InputParamsFieldScaffold)paramsFieldScaffold).setRequired(true);
+        Class clazz = field.getDeclaringClass();
+        if (clazz.isAssignableFrom(Number.class)) {
+            if (Arrays.asList(double.class, float.class, Double.class, Float.class, BigDecimal.class).contains(clazz)) {
+                typeFieldScaffold = TypeFieldScaffold.NUMBER_PRECISION;
+                paramsFieldScaffold = new NumberPrecisionParamsFieldScaffold();
+                ((NumberPrecisionParamsFieldScaffold)paramsFieldScaffold).setRequired(true);
+                ((NumberPrecisionParamsFieldScaffold)paramsFieldScaffold).setPrecision(3);
             } else {
-                typeFieldScaffold = TypeFieldScaffold.NUMBER
-                paramsFieldScaffold = new NumberParamsFieldScaffold()
-                paramsFieldScaffold.setRequired(true)
+                typeFieldScaffold = TypeFieldScaffold.NUMBER;
+                paramsFieldScaffold = new NumberParamsFieldScaffold();
+                ((NumberParamsFieldScaffold)paramsFieldScaffold).setRequired(true);
 
             }
         } else if (clazz.isAssignableFrom(Date.class)) {
-            typeFieldScaffold = TypeFieldScaffold.DATE
-            paramsFieldScaffold = new DateParamsFieldScaffold()
-            paramsFieldScaffold.setRequired(true)
-            paramsFieldScaffold.setDateEmpty(true)
+            typeFieldScaffold = TypeFieldScaffold.DATE;
+            paramsFieldScaffold = new DateParamsFieldScaffold();
+            ((DateParamsFieldScaffold) paramsFieldScaffold).setRequired(true);
+            ((DateParamsFieldScaffold) paramsFieldScaffold).setDateEmpty(true);
         } else if (clazz.isAssignableFrom(Boolean.class)) {
-            typeFieldScaffold = TypeFieldScaffold.CHECKBOX
-            paramsFieldScaffold = new CheckboxParamsFieldScaffold()
-            paramsFieldScaffold.setRequired(false)
-        } else if (clazz.isAssignableFrom( SaguiArquivo.class)) {
-            typeFieldScaffold = TypeFieldScaffold.FILE
-            paramsFieldScaffold = new FileParamsFieldScaffold()
-            paramsFieldScaffold.setRequired(false)
-        } else if (property.enum) {
-            typeFieldScaffold = TypeFieldScaffold.SELECT2
-            paramsFieldScaffold = new Select2ParamsFieldScaffold()
-            paramsFieldScaffold.setDataTextField("text")
-            paramsFieldScaffold.setDataValueField("id")
-            def options = []
-            clazz.values()?.each{
-                options << [id:it.toString(), text:it.toString()]
+            typeFieldScaffold = TypeFieldScaffold.CHECKBOX;
+            paramsFieldScaffold = new CheckboxParamsFieldScaffold();
+            ((InputParamsFieldScaffold) paramsFieldScaffold).setRequired(false);
+        } else if (clazz.isAssignableFrom(byte[].class)) {
+            typeFieldScaffold = TypeFieldScaffold.FILE;
+            paramsFieldScaffold = new FileParamsFieldScaffold();
+            ((FileParamsFieldScaffold) paramsFieldScaffold).setRequired(false);
+        } else if (field.isEnumConstant()) {
+            typeFieldScaffold = TypeFieldScaffold.SELECT2;
+            paramsFieldScaffold = new Select2ParamsFieldScaffold();
+            ((Select2ParamsFieldScaffold) paramsFieldScaffold).setDataTextField("text");
+            ((Select2ParamsFieldScaffold) paramsFieldScaffold).setDataValueField("id");
+            List<Object> options = Collections.emptyList();
+            for(Enum it:(clazz).values()){
+            	Map<String, Object> map = Collections.EMPTY_MAP;
+            	map.put("id", it.toString());
+            	map.put("text", it.toString());
+            	options.add(map);
             }
-            paramsFieldScaffold.setOptions(options)
-            paramsFieldScaffold.setRequired(true)
-        }else if(property.referencedDomainClass){
+	        ((Select2ParamsFieldScaffold)paramsFieldScaffold).setOptions(options);
+	        ((Select2ParamsFieldScaffold)paramsFieldScaffold).setRequired(true);
+        }/*else if(property.referencedDomainClass){
             return this.getTypeAndParamsAssocition(property, fieldScaffold)
-        }
-        paramsFieldScaffold.parent = fieldScaffold
-        return [type: typeFieldScaffold, params: paramsFieldScaffold]
+        }*/
+        paramsFieldScaffold.setParent(fieldScaffold);
+        fieldScaffold.setType(typeFieldScaffold);
+        fieldScaffold.setParams(paramsFieldScaffold);
     }
 
-    private ActionsScaffold getActions(GrailsDomainClass domainClass) {
-        return actionsClassBuilder.getActions(domainClass)
+    private ActionsScaffold getActions(Class domainClass) {
+        return actionsClassBuilder.getActions(domainClass);
     }
 
-    private getTypeAndParamsAssocition(GrailsDomainClassProperty property, FieldScaffold fieldScaffold) {
+    /*private getTypeAndParamsAssocition(GrailsDomainClassProperty property, FieldScaffold fieldScaffold) {
         TypeFieldScaffold typeFieldScaffold = TypeFieldScaffold.INPUT
         ParamsFieldScaffold paramsFieldScaffold = new InputParamsFieldScaffold()
        if (property.isBasicCollectionType()) {
@@ -146,5 +154,5 @@ class FieldClassExtractor {
 
         paramsFieldScaffold.parent = fieldScaffold
         return [type: typeFieldScaffold, params: paramsFieldScaffold]
-    }
+    }*/
 }

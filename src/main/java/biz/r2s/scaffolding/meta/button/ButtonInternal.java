@@ -10,7 +10,7 @@ public class ButtonInternal extends Button{
     String function;
 
     @Override
-    ButtonType getType() {
+    public ButtonType getType() {
         return ButtonType.INTERNAL;
     }
 

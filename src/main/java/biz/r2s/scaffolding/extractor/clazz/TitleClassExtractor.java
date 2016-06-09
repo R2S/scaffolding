@@ -1,31 +1,36 @@
-package br.ufscar.sagui.scaffolding.extractor.clazz
+package  biz.r2s.scaffolding.extractor.clazz;
 
-import br.ufscar.sagui.scaffolding.meta.TitleScaffold
-import br.ufscar.sagui.util.I18nUtils
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import java.util.Arrays;
+import java.util.List;
+
+import  biz.r2s.scaffolding.meta.TitleScaffold;
 
 /**
  * Created by raphael on 30/07/15.
  */
-class TitleClassExtractor {
+public class TitleClassExtractor {
 
-    def keysPrefixoTitle = [":name.title.prefix", "title.prefix"]
+    List<String> keysPrefixoTitle;
+    
+    public TitleClassExtractor(){
+    	keysPrefixoTitle = Arrays.asList(":name.title.prefix", "title.prefix");
+    }
 
-    public TitleScaffold getTitle(GrailsDomainClass domainClass){
-        TitleScaffold titleScaffold = new TitleScaffold()
+    public TitleScaffold getTitle(Class domainClass){
+        TitleScaffold titleScaffold = new TitleScaffold();
 
-        String prefixoTitle = ""
-        String name =  domainClass.name.toLowerCase()
-        for(String key:keysPrefixoTitle){
-            String message = I18nUtils.getMessage(key, name)
-            if(message){
-                prefixoTitle = message
+        String prefixoTitle = null;
+        String name =  domainClass.getName().toLowerCase();
+        /*for(String key:keysPrefixoTitle){
+            String message = I18nUtils.getMessage(key, name);
+            if(message!=null){
+                prefixoTitle = message;
                 break;
             }
-        }
+        }*/
 
-        titleScaffold.setName("${prefixoTitle?prefixoTitle+" ":""}${domainClass.naturalName}")
+        titleScaffold.setName(prefixoTitle!=null?prefixoTitle+" ":""+domainClass.getName());
 
-        return titleScaffold
+        return titleScaffold;
     }
 }

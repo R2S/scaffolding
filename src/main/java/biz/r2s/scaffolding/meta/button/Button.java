@@ -18,7 +18,7 @@ public abstract class Button implements Cloneable{
     TypeActionScaffold actionScaffold;
     Permission permission;
     Object parent;
-    abstract ButtonType getType();
+    public abstract ButtonType getType();
 	public String getName() {
 		return name;
 	}

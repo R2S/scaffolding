@@ -1,73 +1,78 @@
-package br.ufscar.sagui.scaffolding.extractor.clazz
+package  biz.r2s.scaffolding.extractor.clazz;
 
-import br.ufscar.sagui.scaffolding.meta.ResourceUrlScaffold
-import br.ufscar.sagui.scaffolding.meta.TitleScaffold
-import br.ufscar.sagui.scaffolding.meta.datatatable.CampoDatatable
-import br.ufscar.sagui.scaffolding.meta.datatatable.DatatableScaffold
-import br.ufscar.sagui.scaffolding.meta.datatatable.OrderDatatable
-import br.ufscar.sagui.util.GrailsUtil
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import  biz.r2s.scaffolding.meta.ResourceUrlScaffold;
+import  biz.r2s.scaffolding.meta.TitleScaffold;
+import  biz.r2s.scaffolding.meta.datatatable.CampoDatatable;
+import  biz.r2s.scaffolding.meta.datatatable.DatatableScaffold;
+import  biz.r2s.scaffolding.meta.datatatable.OrderDatatable;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import  biz.r2s.core.util.ClassUtils;
+import biz.r2s.core.util.ObjectUtil;
 
 /**
  * Created by raphael on 30/07/15.
  */
 class DatatableClassExtrator {
 
-    static final FIELDS_EXCLUDE = ['version']
+    static final List<String> FIELDS_EXCLUDE = Arrays.asList("version");
 
-    private TitleClassExtractor titleClassBuilder
+    private TitleClassExtractor titleClassBuilder;
 
     public DatatableClassExtrator() {
-        titleClassBuilder = new TitleClassExtractor()
+        titleClassBuilder = new TitleClassExtractor();
     }
 
-    public void initDatatableDefault(DatatableScaffold dataTable, GrailsDomainClass domainClass, String propertyHasMany = null) {
-        dataTable.setPagination(true)
-        dataTable.setSearchable(isSearchable(domainClass))
-        dataTable.setSortable(true)
-        dataTable.setOrdenate(true)
-        dataTable.setSort("id")
-        dataTable.setOrder(OrderDatatable.DESC)
-        dataTable.setTitle(this.getTitle(domainClass))
-        dataTable.setNumMaxPaginate(10)
-        dataTable.setResourceUrlScaffold(ResourceUrlScaffold.builder(domainClass, propertyHasMany))
-        dataTable.setColumns(this.getColumns(domainClass, dataTable))
+    public void initDatatableDefault(DatatableScaffold dataTable, Class domainClass) {
+    	initDatatableDefault(dataTable,domainClass,null);
+    }
+    public void initDatatableDefault(DatatableScaffold dataTable, Class domainClass, String propertyHasMany) {
+        dataTable.setPagination(true);
+        dataTable.setSearchable(isSearchable(domainClass));
+        dataTable.setSortable(true);
+        dataTable.setOrdenate(true);
+        dataTable.setSort("id");
+        dataTable.setOrder(OrderDatatable.DESC);
+        dataTable.setTitle(this.getTitle(domainClass));
+        dataTable.setNumMaxPaginate(10);
+        dataTable.setResourceUrlScaffold(ResourceUrlScaffold.builder(domainClass, propertyHasMany));
+        dataTable.setColumns(this.getColumns(domainClass, dataTable));
 
     }
 
-    private TitleScaffold getTitle(GrailsDomainClass domainClass) {
-        return titleClassBuilder.getTitle(domainClass)
+    private TitleScaffold getTitle(Class domainClass) {
+        return titleClassBuilder.getTitle(domainClass);
     }
 
 
-    private boolean isSearchable(GrailsDomainClass domainClass) {
-        try {
-            return (domainClass?.clazz?."searchable" != null)
-        } catch (Exception e) {
-            return false
-        }
+    private boolean isSearchable(Class domainClass) {
+        //TODO:SEARCHABLE
+    	return false;
     }
 
-    private List<CampoDatatable> getColumns(GrailsDomainClass domainClass, DatatableScaffold dataTable) {
-        List<CampoDatatable> campos = []
-        int count = 0
-        GrailsUtil.getPersistentProperties(domainClass).each {prop->
-            if(validateColumn(prop)){
-                count++
-                CampoDatatable campo = new CampoDatatable()
-                campo.key = prop.fieldName
-                campo.name = prop.name
-                campo.title = prop.naturalName
-                campo.parent = dataTable
-                campo.order = count
-                campos << campo
+    private List<CampoDatatable> getColumns(Class domainClass, DatatableScaffold dataTable) {
+        List<CampoDatatable> campos = Collections.emptyList();
+        int count = 0;
+        for(Field field: domainClass.getFields()){
+            if(validateColumn(field)){
+                count++;
+                CampoDatatable campo = new CampoDatatable();
+                campo.setKey(field.getName());
+                campo.setName(field.getName());
+                campo.setTitle(field.getName());
+                campo.setParent(dataTable);
+                campo.setOrder(count);
+                campos.add(campo);
             }
         }
-        return campos
+        return campos;
     }
 
-    private boolean validateColumn(GrailsDomainClassProperty property){
-        !(property.isOneToMany()||property.name in FIELDS_EXCLUDE)
+    private boolean validateColumn(Field field){
+        return !(FIELDS_EXCLUDE.contains(field.getName()));
     }
 }

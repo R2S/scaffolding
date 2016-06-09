@@ -1,80 +1,84 @@
-package br.ufscar.sagui.scaffolding.extractor.scaffolding
+package biz.r2s.scaffolding.extractor.scaffolding;
 
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.meta.MenuScaffold
-import br.ufscar.sagui.scaffolding.meta.TitleScaffold
+import java.util.Map;
+
+import biz.r2s.scaffolding.meta.ClassScaffold;
+import biz.r2s.scaffolding.meta.MenuScaffold;
+import biz.r2s.scaffolding.meta.TitleScaffold;
+import biz.r2s.scaffolding.meta.icon.IconScaffold;
 
 /**
  * Created by raphael on 06/08/15.
  */
 class MenuScaffoldingExtrator {
-    TitleScaffoldingExtrator titleScaffoldingExtrator
-    IconScaffoldingExtrator iconScaffoldingExtrator
+    TitleScaffoldingExtrator titleScaffoldingExtrator;
+    IconScaffoldingExtrator iconScaffoldingExtrator;
 
     public MenuScaffoldingExtrator() {
-        titleScaffoldingExtrator = new TitleScaffoldingExtrator()
-        iconScaffoldingExtrator = new IconScaffoldingExtrator()
+        titleScaffoldingExtrator = new TitleScaffoldingExtrator();
+        iconScaffoldingExtrator = new IconScaffoldingExtrator();
     }
 
-    void changeMenu(def classScaffolding, ClassScaffold classScaffold) {
-        def menuValue = classScaffolding.get("menu")
-        if (menuValue) {
-            MenuScaffold menuScaffold = classScaffold.menu
+    public void changeMenu(Map<String, Object> classScaffolding, ClassScaffold classScaffold) {
+        Object menuValue = classScaffolding.get("menu");
+        if (menuValue!=null) {
+            MenuScaffold menuScaffold = classScaffold.getMenu();
             if (menuValue instanceof String) {
-                menuScaffold.title.name = menuValue
+                menuScaffold.getTitle().setName((String) menuValue);
             } else if (menuValue instanceof Boolean) {
-                menuScaffold.enabled = menuValue
+                menuScaffold.setEnabled((boolean) menuValue);
             } else if (menuValue instanceof Map) {
-                changeTitle(menuValue, menuScaffold)
-                changeIcon(menuValue, menuScaffold)
-                changeRoot(menuValue, menuScaffold)
-                changeEnabled(menuValue, menuScaffold)
-                changeKey(menuValue, menuScaffold)
+                changeTitle((Map) menuValue, menuScaffold);
+                changeIcon((Map) menuValue, menuScaffold);
+                changeRoot((Map) menuValue, menuScaffold);
+                changeEnabled((Map) menuValue, menuScaffold);
+                changeKey((Map) menuValue, menuScaffold);
             }
         }else{
-            TitleScaffold titleScaffold = classScaffold.menu?.title
+            TitleScaffold titleScaffold = classScaffold.getMenu().getTitle();
 
-            if(classScaffold.name){
-                titleScaffold = new TitleScaffold(name: classScaffold.name)
-            }else if(classScaffold?.title?.name){
-                titleScaffold = classScaffold?.title
+            if(classScaffold.getName()!=null){
+                titleScaffold = new TitleScaffold();
+                		titleScaffold.setName(classScaffold.getName());
+            }else if(classScaffold.getTitle().getName()!=null){
+                titleScaffold = classScaffold.getTitle();
             }
-            classScaffold.menu?.title = titleScaffold
+            classScaffold.getMenu().setTitle(titleScaffold);
         }
     }
 
-    void changeTitle(def menuScaffolding, MenuScaffold menuScaffold) {
-        TitleScaffold titleScaffold = titleScaffoldingExtrator.getTitle(menuScaffolding)
-        if (titleScaffold) {
-            menuScaffold.title = titleScaffold
+    void changeTitle(Map menuScaffolding, MenuScaffold menuScaffold) {
+        TitleScaffold titleScaffold = titleScaffoldingExtrator.getTitle(menuScaffolding);
+        if (titleScaffold!=null) {
+            menuScaffold.setTitle(titleScaffold);
         }
     }
 
-    void changeIcon(def menuScaffolding, MenuScaffold menuScaffold){
-        def icon = iconScaffoldingExtrator.getIcon(menuScaffolding)
+    void changeIcon(Map menuScaffolding, MenuScaffold menuScaffold){
+        IconScaffold icon = iconScaffoldingExtrator.getIcon(menuScaffolding);
         if(icon !=null){
-            menuScaffold.icon = icon
+            menuScaffold.setIcon(icon);
         }
     }
 
-    void changeRoot(def menuScaffolding, MenuScaffold menuScaffold){
-        def rootValue = menuScaffolding.get("root")
+    void changeRoot(Map menuScaffolding, MenuScaffold menuScaffold){
+        String rootValue = (String) menuScaffolding.get("root");
         if(rootValue !=null){
-            menuScaffold.root = rootValue
+            menuScaffold.setRoot(rootValue);
         }
     }
 
-    void changeKey(def menuScaffolding, MenuScaffold menuScaffold){
-        def keyValue = menuScaffolding.get("key")
+    void changeKey(Map menuScaffolding, MenuScaffold menuScaffold){
+        String keyValue = (String) menuScaffolding.get("key");
         if(keyValue !=null){
-            menuScaffold.key = keyValue
+            menuScaffold.setKey(keyValue);
         }
     }
 
-    void changeEnabled(def menuScaffolding, MenuScaffold menuScaffold){
-        def enabledValue = menuScaffolding.get("enabled")
+    void changeEnabled(Map menuScaffolding, MenuScaffold menuScaffold){
+        Boolean enabledValue = (Boolean) menuScaffolding.get("enabled");
         if(enabledValue !=null){
-            menuScaffold.enabled = enabledValue
+            menuScaffold.setEnabled(enabledValue); 
         }
     }
 }

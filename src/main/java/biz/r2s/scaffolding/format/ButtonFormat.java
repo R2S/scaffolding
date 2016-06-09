@@ -1,88 +1,110 @@
-package br.ufscar.sagui.scaffolding.format
+package biz.r2s.scaffolding.format;
 
-import br.ufscar.sagui.scaffolding.RulesFacade
-import br.ufscar.sagui.scaffolding.meta.ResourceUrl
-import br.ufscar.sagui.scaffolding.meta.action.TypeActionScaffold
-import br.ufscar.sagui.scaffolding.meta.button.*
-import org.apache.commons.codec.language.bm.Rule
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+
+import biz.r2s.scaffolding.RulesFacade;
+import biz.r2s.scaffolding.meta.ResourceUrl;
+import biz.r2s.scaffolding.meta.action.TypeActionScaffold;
+import biz.r2s.scaffolding.meta.button.*;
 
 /**
  * Created by raphael on 04/04/16.
  */
-class ButtonFormat {
-    CommonFormat commonFormat
+public class ButtonFormat {
+    CommonFormat commonFormat;
 
     public ButtonFormat(){
-        commonFormat=  new CommonFormat()
+        commonFormat=  new CommonFormat();
     }
 
-    def formatButtons(def permission, List<Button> buttons, TypeActionScaffold actionScaffold, def fatherId) {
-        def positionButtonMeta = [:]
+    public Map formatButtons(Map permission, List<Button> buttons, TypeActionScaffold actionScaffold, final Object fatherId) {
+        Map positionButtonMeta = Collections.emptyMap();
 
-        RulesFacade.getInstance().getButtons(permission, buttons, actionScaffold).each { PositionButton positionButton, List<Button> buttonsF ->
-            positionButtonMeta.put(positionButton, buttonsF.collect({this.formatButton(it, fatherId)}))
+        Map<PositionButton, List<Button>> buttonsPositions = RulesFacade.getInstance().getButtons(permission, buttons, actionScaffold);
+        for(PositionButton positionButton:buttonsPositions.keySet()){
+        	List<Button> buttonsF = buttonsPositions.get(positionButton);
+        	positionButtonMeta.put(positionButton, CollectionUtils.collect(buttonsF, new Transformer() {				
+				@Override
+				public Object transform(Object arg0) {
+					return formatButton((Button)arg0, fatherId);
+				}
+			}));
+        	
         }
-        return positionButtonMeta
+        return positionButtonMeta;
+    }
+    Map formatUrlActionButton(ButtonAction action) {
+        return ResourceUrl.formatUrl(action.getUrl(), action.getHttpMethod());
+    }
+    Map formatUrlActionButton(ButtonAction action, Object fatherId) {
+    	return ResourceUrl.formatUrl(action.getUrl(), action.getHttpMethod());
     }
 
-    def formatUrlActionButton(ButtonAction action, def fatherId = null) {
-        ResourceUrl.formatUrl(action.url, action.httpMethod)
+    Map formatButton(Button button){
+    	return formatButton(button, null);
     }
-
-    def formatButton(Button button, def fatherId = null){
-        Map buttonMap = formatButtonBasic(button)
-
+    Map formatButton(Button button, Object fatherId){
+        Map buttonMap = formatButtonBasic(button);
         switch (button.getType()){
-            case ButtonType.ACTION:
-                buttonMap.putAll(this.formatButtonAction(button, fatherId))
+            case ACTION:
+                buttonMap.putAll(this.formatButtonAction((ButtonAction) button, fatherId));
                 break;
-            case ButtonType.REDIRECT:
-                buttonMap.putAll(this.formatButtonRedirect(button, fatherId))
+            case REDIRECT:
+                buttonMap.putAll(this.formatButtonRedirect((ButtonRedirect) button, fatherId));
                 break;
-            case ButtonType.INTERNAL:
-                buttonMap.putAll(this.formatButtonInternal(button, fatherId))
+            case INTERNAL:
+                buttonMap.putAll(this.formatButtonInternal((ButtonInternal) button, fatherId));
                 break;
-            case ButtonType.HASMANY_EDIT:
-                buttonMap.putAll(this.formatButtonHasManyEdit(button, fatherId))
+            case HASMANY_EDIT:
+                buttonMap.putAll(this.formatButtonHasManyEdit((ButtonHasManyEdit) button, fatherId));
                 break;
         }
-        return buttonMap
+        return buttonMap;
     }
 
-    def formatButtonBasic(Button button){
-        def meta = [:]
-        meta.name = button.name
-        meta.label = button.label
-        meta.type = button.type.toString()
-        meta.classCss = button.classCss
+    Map formatButtonBasic(Button button){
+    	Map meta = Collections.emptyMap();
+        meta.put("name", button.getName());
+        meta.put("label", button.getLabel());
+        meta.put("type", button.getType().toString());
+        meta.put("classCss", button.getClassCss());
         //meta.positions = button.positionsButton.collect({it.toString()})
-        if (button.icon) {
-            meta.icon = commonFormat.formatIcon(button.icon)
+        if (button.getIcon()!=null) {
+            meta.put("icon",commonFormat.formatIcon(button.getIcon()));
         }
-        return meta
+        return meta;
     }
 
-    def formatButtonAction(ButtonAction button, def fatherId = null){
-        def meta = [:]
-        meta.url = this.formatUrlActionButton(button, fatherId)
-        meta.confirmation = button.confirmation
-        return meta
+    Map formatButtonAction(ButtonAction button, Object fatherId){
+    	Map meta = Collections.emptyMap();
+        meta.put("url", this.formatUrlActionButton(button, fatherId));
+        meta.put("confirmation",button.getConfirmation());
+        return meta;
     }
 
-    def formatButtonRedirect(ButtonRedirect button, def fatherId = null){
-        def meta = [:]
-        meta.rota = button.rota
-        return meta
+    Map formatButtonRedirect(ButtonRedirect button, Object fatherId){
+    	Map meta = Collections.emptyMap();
+        meta.put("rota", button.getRota());
+        return meta;
     }
 
-    def formatButtonInternal(ButtonInternal button, def fatherId = null){
-        def meta = [:]
-        meta.function = [name: button.function, params: button.params]
-        return meta
+    Map formatButtonInternal(ButtonInternal button, Object fatherId){
+    	Map meta = Collections.emptyMap();
+    	Map function = Collections.emptyMap();
+    	function.put("params",button.getFunction());
+    	function.put("name", button.getParams());
+        meta.put("function", function); 
+        return meta;
     }
 
-    def formatButtonHasManyEdit(ButtonHasManyEdit button, def fatherId = null){
-        return [:]
+    Map formatButtonHasManyEdit(ButtonHasManyEdit button, Object fatherId){
+        return Collections.emptyMap();
     }
 
 }

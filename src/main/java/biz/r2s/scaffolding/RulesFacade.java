@@ -21,12 +21,12 @@ import biz.r2s.scaffolding.security.PermissionFacade;
  */
 public class RulesFacade {
 
-    static List<String> FIELD_EXCLUDE_CREATE = Collections.EMPTY_LIST;
-    static List<String> FIELD_INCLUDE_CREATE = Collections.EMPTY_LIST;
-    static List<String> FIELD_EXCLUDE_EDIT = Collections.EMPTY_LIST;
-    static List<String> FIELD_INCLUDE_EDIT = Collections.EMPTY_LIST;
-    static List<String> FIELD_EXCLUDE_LIST = Collections.EMPTY_LIST;
-    static List<String> FIELD_INCLUDE_LIST = Collections.EMPTY_LIST;
+    static List<String> FIELD_EXCLUDE_CREATE = Collections.emptyList();
+    static List<String> FIELD_INCLUDE_CREATE = Collections.emptyList();
+    static List<String> FIELD_EXCLUDE_EDIT = Collections.emptyList();
+    static List<String> FIELD_INCLUDE_EDIT = Collections.emptyList();
+    static List<String> FIELD_EXCLUDE_LIST = Collections.emptyList();
+    static List<String> FIELD_INCLUDE_LIST = Collections.emptyList();
 
     static RulesFacade _instance;
 
@@ -42,7 +42,7 @@ public class RulesFacade {
         permissionFacade = new PermissionFacade();
     }
 
-    static RulesFacade getInstance() {
+    public static RulesFacade getInstance() {
         if (_instance==null) {
             _instance = new RulesFacade();
         }
@@ -67,95 +67,118 @@ public class RulesFacade {
 
 
 
-    Map<FieldScaffold, Boolean> getFieldsCreate(def permission, List<FieldScaffold> fields) {
-        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = [:]
-        fields.each { FieldScaffold field ->
-           if (!(field.key in FIELD_EXCLUDE_CREATE) && (hasPermissionField(permission, field, TypeActionScaffold.CREATE) || field.key in FIELD_INCLUDE_CREATE)) {
-                    fieldScaffoldBooleanMap.put(field, !field.insertable)
+    public Map<FieldScaffold, Boolean> getFieldsCreate(Map<String, Object> permission, List<FieldScaffold> fields) {
+        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = Collections.emptyMap();
+        for(FieldScaffold field:fields){
+           if (!(FIELD_EXCLUDE_CREATE.contains(field.getKey())) && (hasPermissionField(permission, field, TypeActionScaffold.CREATE) || FIELD_INCLUDE_CREATE.contains(field.getKey()))) {
+                    fieldScaffoldBooleanMap.put(field, !field.isInsertable());
            }
         }
-        return fieldScaffoldBooleanMap.sort({it.key.order})
+        return fieldScaffoldBooleanMap;
     }
 
-    boolean isBidirecional(FieldScaffold field, Class fatherClass){
-        field.bidirecional&&field.clazzType.isAssignableFrom(fatherClass)
-
+    public boolean isBidirecional(FieldScaffold field, Class fatherClass){
+        return field.isBidirecional()&&field.getClazzType().isAssignableFrom(fatherClass);
     }
 
-    Map<FieldScaffold, Boolean> getFieldsEdit(def permission, List<FieldScaffold> fields) {
-        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = [:]
-        fields.each { FieldScaffold field ->
-            if(!(field.key in FIELD_EXCLUDE_EDIT)){
-                if (hasPermissionField(permission, field, TypeActionScaffold.EDIT) || field.key in FIELD_INCLUDE_EDIT) {
-                    fieldScaffoldBooleanMap.put(field, !field.updateable)
+    public Map<FieldScaffold, Boolean> getFieldsEdit(Map<String, Object> permission, List<FieldScaffold> fields) {
+        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = Collections.emptyMap();
+        for( FieldScaffold field: fields){
+            if(!(FIELD_EXCLUDE_EDIT.contains(field.getKey()))){
+                if (hasPermissionField(permission, field, TypeActionScaffold.EDIT) || FIELD_INCLUDE_EDIT.contains(field.getKey())) {
+                    fieldScaffoldBooleanMap.put(field, !field.isUpdateable());
                 } else if (hasPermissionField(permission, field, TypeActionScaffold.VIEW)) {
-                    fieldScaffoldBooleanMap.put(field, true)
+                    fieldScaffoldBooleanMap.put(field, true);
                 }
             }
         }
-        return fieldScaffoldBooleanMap.sort({it.key.order})
+        return fieldScaffoldBooleanMap;
     }
 
-    List<FieldScaffold> getFieldsShow(def permission, List<FieldScaffold> fields) {
-        List<FieldScaffold> fieldScaffolds = []
-        fields.each { FieldScaffold field ->
-            if (hasPermissionField(permission, field, TypeActionScaffold.VIEW) || hasPermissionField(permission, field, TypeActionScaffold.CREATE) || hasPermissionField(permission, field, TypeActionScaffold.EDIT)) {
-                if(!field.isTypeHasMany()&&field.type!=TypeFieldScaffold.STATIC){
-                    field.type = TypeFieldScaffold.STATIC
-                    field.params = new StaticParamsFieldScaffold()
+    public List<FieldScaffold> getFieldsShow(Map<String, Object> permission, List<FieldScaffold> fields) {
+        List<FieldScaffold> fieldScaffolds = Collections.emptyList();
+        for(FieldScaffold field: fields){
+        	if (hasPermissionField(permission, field, TypeActionScaffold.VIEW) || hasPermissionField(permission, field, TypeActionScaffold.CREATE) || hasPermissionField(permission, field, TypeActionScaffold.EDIT)) {
+                if(!field.isTypeHasMany()&&field.getType()!=TypeFieldScaffold.STATIC){
+                    field.setType(TypeFieldScaffold.STATIC);
+                    field.setParams(new StaticParamsFieldScaffold());
                 }
-                fieldScaffolds << field
+                fieldScaffolds.add(field);
             }
         }
-        return fieldScaffolds
+        return fieldScaffolds;
     }
-
-    Map<PositionButton, Button> getButtons(def permission, List<Button> buttons, TypeActionScaffold typeActionScaffold = null) {
-        Map<PositionButton, Button> buttonScaffolds = [:]
-        List<PositionButton> positionsButtons = PositionButton.values().findAll{it.typeActionScaffold == typeActionScaffold}
-        List<Button> buttonsFilter = buttons.findAll({permission.actions.get(it.actionScaffold) &&  (typeActionScaffold && it.positionsButton.typeActionScaffold.contains(typeActionScaffold))})
-        buttonsFilter.each { Button button->
-            if (hasPermissionButton(permission, button)) {
-                button.positionsButton.each {PositionButton positionButton->
-                    if(positionButton in positionsButtons){
-                        List<Button> buttonsMap =  buttonScaffolds.get(positionButton)
-                        if(buttonsMap){
-                            buttonsMap << button
+    public Map<PositionButton, List<Button>> getButtons(Map<String, Object> permission, List<Button> buttons) {
+    	return getButtons(permission, buttons, null);
+    }
+    public Map<PositionButton, List<Button>> getButtons(Map<String, Object> permission, List<Button> buttons, TypeActionScaffold typeActionScaffold) {
+        Map<PositionButton, List<Button>> buttonScaffolds = Collections.emptyMap();
+        List<PositionButton> positionsButtons = PositionButton.listByTypeActionScaffold(typeActionScaffold);
+        List<Button> buttonsFilter = filterButtons((Map<TypeActionScaffold, Boolean>) permission.get("buttons"), typeActionScaffold, buttons);
+        for(Button button:buttonsFilter){
+        	if (hasPermissionButton(permission, button)) {
+        		for(PositionButton positionButton:button.getPositionsButton()){
+        			if(positionsButtons.contains(positionButton)){
+                        List<Button> buttonsMap =  (List<Button>) buttonScaffolds.get(positionButton);
+                        if(buttonsMap!=null){
+                            buttonsMap.add(button);
                         }else{
-                            buttonScaffolds.put(positionButton, [button])
+                            buttonScaffolds.put(positionButton, Arrays.asList(button));
                         }
                     }
-                }
+        		}
+            }
+        }       
+        return buttonScaffolds;
+    }
+    
+    private List<Button> filterButtons(Map<TypeActionScaffold, Boolean> actionsPermission, TypeActionScaffold typeActionScaffold, List<Button> buttons){
+    	List<Button> buttonsFilter = Collections.emptyList();
+    	for(Button button: buttons){
+    		
+    		List<TypeActionScaffold> typeActionScaffolds = Collections.emptyList();
+    		
+    		for(PositionButton positionButton: button.getPositionsButton()){
+    			typeActionScaffolds.add(positionButton.getTypeActionScaffold());
+    		}   				
+    		
+    		if(actionsPermission.get(button.getActionScaffold()) &&  (typeActionScaffold!=null && typeActionScaffolds.contains(typeActionScaffold))){
+    			buttonsFilter.add(button);
+    		}
+    	}
+    	return buttonsFilter;
+    }
+    
+
+    public Map<String, TypeActionScaffold> getActions(Map<String, Object> permission) {
+        Map<String, TypeActionScaffold> actionScaffoldMap = Collections.emptyMap();
+        Map<String, Boolean> actions = (Map<String, Boolean>) permission.get("actions");
+        
+        for(String key:actions.keySet()){
+        	boolean isPermission = actions.get(key);
+        	TypeActionScaffold typeActionScaffold = TypeActionScaffold.valueOf(key);
+        	if ((typeActionScaffold == TypeActionScaffold.VIEW && isPermissionShow(actions)) || isPermission || !enablePermission()) {
+                actionScaffoldMap.put(ActionsScaffold.getNameAction(typeActionScaffold), typeActionScaffold);
             }
         }
-        return buttonScaffolds
+        return actionScaffoldMap;
     }
 
-    Map<String, TypeActionScaffold> getActions(def permission) {
-        Map<String, TypeActionScaffold> actionScaffoldMap = [:]
-        permission.actions.each { TypeActionScaffold typeActionScaffold, boolean isPermission ->
-            if ((typeActionScaffold == TypeActionScaffold.VIEW && isPermissionShow(permission.actions)) || isPermission || !enablePermission()) {
-                actionScaffoldMap.put(ActionsScaffold.getNameAction(typeActionScaffold), typeActionScaffold)
-            }
-        }
-        return actionScaffoldMap
-    }
-
-    private isPermissionShow(def permissionActions) {
+    private boolean isPermissionShow(Map<String, Boolean> permissionActions) {
         if(!enablePermission()){
-            return true
+            return true;
         }
 
-        boolean isShow = false
+        boolean isShow = false;
 
-        if (permissionActions.get(TypeActionScaffold.CREATE) == true) {
-            isShow = true
-        } else if (permissionActions.get(TypeActionScaffold.EDIT) == true) {
-            isShow = true
-        } else if (permissionActions.get(TypeActionScaffold.DELETE) == true) {
-            isShow = true
+        if (permissionActions.get(TypeActionScaffold.CREATE.toString()) == true) {
+            isShow = true;
+        } else if (permissionActions.get(TypeActionScaffold.EDIT.toString()) == true) {
+            isShow = true;
+        } else if (permissionActions.get(TypeActionScaffold.DELETE.toString()) == true) {
+            isShow = true;
         }
-        return isShow
+        return isShow;
     }
 
 
@@ -169,64 +192,75 @@ public class RulesFacade {
             return true;
         }
 
-        Object campoField = permission.fields.get(column.name).get(TypeActionScaffold.LIST);
+        Map<String, Object> fields = (Map<String, Object>) permission.get("fields");
+        Object campoField = ((Map<String, Object>) fields.get(column.getName())).get(TypeActionScaffold.LIST);
 
-        return campoField ? true : false;
+        return campoField!=null ? true : false;
     }
 
     private FieldScaffold getByCampoDatatable(CampoDatatable campoDatatable) {
-        return null;//campoDatatable.parent.getClassScaffold().fields.find({ it.key == campoDatatable.name })
+    	for(FieldScaffold fieldScaffold:campoDatatable.getParent().getClassScaffold().getFields()){
+    		if(fieldScaffold.getKey() == campoDatatable.getName()){
+    			return fieldScaffold;
+    		}
+    	}    	
+        return null;
     }
 
-    def hasPermissionButton(def permission, Button button){
-        def buttonPermission = permission.buttons.get(button.name)
+    public boolean hasPermissionButton(Map<String, Object> permission, Button button){
+    	Map<String, Object>  buttons = (Map<String, Object>) permission.get("buttons");
+        Object buttonPermission = buttons.get(button.getName());
 
-        return buttonPermission ? true : false
+        return buttonPermission!=null ? true : false;
     }
 
-    def hasPermissionField(def permission, FieldScaffold field, TypeActionScaffold actionScaffold) {
-        if(actionScaffold == TypeActionScaffold.VIEW&&field.transients&&!field.isMandatory()&&field.parent?.transiendsShow?.find({field.key==it})){
-            return true
+    public boolean hasPermissionField(Map<String, Object> permission, FieldScaffold field, TypeActionScaffold actionScaffold) {
+    	List<String> transiendsShow = field.getParent().getTransiendsShow();
+    	
+        if(actionScaffold == TypeActionScaffold.VIEW&&field.isTransients()&&!field.isMandatory()&&transiendsShow.contains(field.getKey())){
+            return true;
         }
 
-        if(field.transients){
-            return false
+        if(field.isTransients()){
+            return false;
         }
 
         if (!hasManyForm() && field.isTypeHasMany()) {
-            return false
+            return false;
         }
 
-        if (!field.scaffold) {
-            return false
+        if (!field.isScaffold()) {
+            return false;
         }
 
         if (actionScaffold == TypeActionScaffold.CREATE && field.isMandatory()) {
-            return true
+            return true;
         }
 
         if(!enablePermission()){
-            return true
+            return true;
         }
+        Map<String, Object> fields = (Map<String, Object>) permission.get("permission");
+        Map<String, Object> fieldMap = (Map<String, Object>) fields.get(field.getKey());
+        
+        Object fieldPermission = fieldMap.get(actionScaffold);
 
-        def fieldPermission = permission.fields.get(field.key)?.get(actionScaffold)
-
-        return fieldPermission ? true : false
+        return fieldPermission!=null ? true : false;
     }
 
     private boolean hasManyDatatable() {
-        return false
+        return false;
     }
 
     private boolean hasManyForm() {
-        return true
+        return true;
     }
 
     public boolean enablePermission(){
-        return true
+        return true;
     }
 
     public boolean enablePermissionMenu(){
-        return true
+        return true;
     }
 }

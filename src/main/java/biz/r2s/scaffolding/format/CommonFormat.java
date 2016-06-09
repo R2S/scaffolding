@@ -1,55 +1,69 @@
-package br.ufscar.sagui.scaffolding.format
+package biz.r2s.scaffolding.format;
 
-import br.ufscar.sagui.scaffolding.RulesFacade
-import br.ufscar.sagui.scaffolding.meta.ResourceUrlScaffold
-import br.ufscar.sagui.scaffolding.meta.TitleScaffold
-import br.ufscar.sagui.scaffolding.meta.action.ActionScaffold
-import br.ufscar.sagui.scaffolding.meta.action.ActionsScaffold
-import br.ufscar.sagui.scaffolding.meta.action.TypeActionScaffold
-import br.ufscar.sagui.scaffolding.meta.icon.IconScaffold
-import br.ufscar.sagui.scaffolding.meta.icon.TypeIcon
+import java.util.Collections;
+import java.util.Map;
+
+import biz.r2s.core.util.ObjectUtil;
+import biz.r2s.scaffolding.RulesFacade;
+import biz.r2s.scaffolding.meta.ResourceUrlScaffold;
+import biz.r2s.scaffolding.meta.TitleScaffold;
+import biz.r2s.scaffolding.meta.action.ActionScaffold;
+import biz.r2s.scaffolding.meta.action.ActionsScaffold;
+import biz.r2s.scaffolding.meta.action.TypeActionScaffold;
+import biz.r2s.scaffolding.meta.icon.IconScaffold;
+import biz.r2s.scaffolding.meta.icon.TypeIcon;
 
 /**
  * Created by raphael on 11/08/15.
  */
-class CommonFormat {
-    def formatTitle(TitleScaffold ts){
-        return "$ts.name${ts.subTitle?' ('+ts.subTitle+')':''}"
+public class CommonFormat {
+    String formatTitle(TitleScaffold ts){
+        return "$ts.name${ts.subTitle?' ('+ts.subTitle+')':''}";
     }
 
-    def formatIcon(IconScaffold iconScaffold){
-        return [class:getClassIcon(iconScaffold), position:iconScaffold?.position?.name()?.toLowerCase()]
+    public Map formatIcon(IconScaffold iconScaffold){
+    	Map map = Collections.emptyMap();
+    	map.put("class", getClassIcon(iconScaffold));
+    	map.put("position",iconScaffold.getPosition().name().toLowerCase());
+    	return map;
     }
 
-    def getClassIcon(IconScaffold iconScaffold){
-        return TypeIcon.format(iconScaffold.type, iconScaffold.name)
+    String getClassIcon(IconScaffold iconScaffold){
+        return TypeIcon.format(iconScaffold.getType(), iconScaffold.getName());
     }
 
-    def formatActions(def permission, ActionsScaffold actionsScaffold, ResourceUrlScaffold resourceUrlScaffold, def fatherId ){
-        def meta = [create:null, edit:null, delete:null, show:null, list:null]
-        RulesFacade.instance.getActions(permission).each {String nomeAction, TypeActionScaffold typeActionScaffold ->
-            ActionScaffold actionScaffold = actionsScaffold."$nomeAction"
-           if(actionScaffold.enabled){
-                meta."$nomeAction" = formatAction(actionScaffold, resourceUrlScaffold, typeActionScaffold, fatherId)
-            }
+    Map formatActions(Map permission, ActionsScaffold actionsScaffold, ResourceUrlScaffold resourceUrlScaffold, Object fatherId ){
+        Map meta = Collections.emptyMap();
+        
+        meta.put("create",null);
+        meta.put("edit",null);
+        meta.put("delete",null);
+        meta.put("show",null);
+        meta.put("list",null);
+        Map<String, TypeActionScaffold> actions = RulesFacade.getInstance().getActions(permission);
+        for(String nomeAction:actions.keySet()){
+        	TypeActionScaffold typeActionScaffold =  actions.get(nomeAction);
+        	ActionScaffold actionScaffold = (ActionScaffold) ObjectUtil.getValue("nomeAction", actionsScaffold);
+        	if(actionScaffold.isEnabled()){
+        		meta.put(nomeAction,formatAction(actionScaffold, resourceUrlScaffold, typeActionScaffold, fatherId));
+        	}        	
         }
-        return meta
+        return meta;
     }
 
-    def formatAction(ActionScaffold actionScaffold,  ResourceUrlScaffold resourceUrlScaffold, TypeActionScaffold typeActionScaffold, def fatherId ){
-        if(!actionScaffold){
-            return null
+    Map formatAction(ActionScaffold actionScaffold,  ResourceUrlScaffold resourceUrlScaffold, TypeActionScaffold typeActionScaffold, Object fatherId ){
+    	 
+    	if(actionScaffold==null){
+            return null;
         }
 
-        def meta = [:]
-        meta.title = this.formatTitle(actionScaffold.title)
-        meta.url = resourceUrlScaffold.resolver(typeActionScaffold, fatherId).formatUrl()
-        return meta
+    	Map meta = Collections.emptyMap();
+        meta.put("title",this.formatTitle(actionScaffold.getTitle()));
+        meta.put("url",resourceUrlScaffold.resolver(typeActionScaffold, fatherId).formatUrl());
+        return meta;
     }
 
-
-
-    def tratarUrl(String url){
-        url.replace("(*)", ":id")
+    String tratarUrl(String url){
+        return url.replace("(*)", ":id");
     }
 }

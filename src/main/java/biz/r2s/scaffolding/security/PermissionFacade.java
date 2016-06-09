@@ -87,10 +87,10 @@ public class PermissionFacade {
     }
 
     public boolean isPermission(Map<String, Object> roles) {
-        if(!RulesFacade.instance.enablePermission()){
+        if(!RulesFacade.getInstance().enablePermission()){
             return true;
         }        
-        //TODO: pegar bean de segurança
+        //TODO: pegar bean de seguranï¿½a
         return true;
     }
 

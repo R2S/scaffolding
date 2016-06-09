@@ -1,68 +1,88 @@
-package br.ufscar.sagui.scaffolding.format
+package biz.r2s.scaffolding.format;
 
-import br.ufscar.sagui.scaffolding.RulesFacade
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.meta.ResourceUrlScaffold
-import br.ufscar.sagui.scaffolding.meta.action.TypeActionScaffold
-import br.ufscar.sagui.scaffolding.meta.datatatable.CampoDatatable
-import br.ufscar.sagui.scaffolding.meta.datatatable.DatatableScaffold
-import br.ufscar.sagui.scaffolding.meta.datatatable.OrderDatatable
-import br.ufscar.sagui.scaffolding.meta.field.TypeFieldScaffold
-import br.ufscar.sagui.scaffolding.security.PermissionFacade
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import biz.r2s.scaffolding.RulesFacade;
+import biz.r2s.scaffolding.meta.ClassScaffold;
+import biz.r2s.scaffolding.meta.ResourceUrlScaffold;
+import biz.r2s.scaffolding.meta.action.TypeActionScaffold;
+import biz.r2s.scaffolding.meta.datatatable.CampoDatatable;
+import biz.r2s.scaffolding.meta.datatatable.DatatableScaffold;
+import biz.r2s.scaffolding.meta.datatatable.OrderDatatable;
+import biz.r2s.scaffolding.meta.field.FieldScaffold;
+import biz.r2s.scaffolding.meta.field.TypeFieldScaffold;
+import biz.r2s.scaffolding.security.PermissionFacade;
 
 /**
  * Created by raphael on 11/08/15.
  */
-class DatatableFormat {
+public class DatatableFormat {
 
-    PermissionFacade permissionFacade
-    CommonFormat commonFormat
+	PermissionFacade permissionFacade;
+	CommonFormat commonFormat;
 
-    public DatatableFormat() {
-        commonFormat = new CommonFormat()
-        permissionFacade = new PermissionFacade()
-    }
+	public DatatableFormat() {
+		commonFormat = new CommonFormat();
+		permissionFacade = new PermissionFacade();
+	}
+	public Map<String, Object> formatarDatatable(Map<String, Object> permission, DatatableScaffold dt) {
+		return formatarDatatable(permission, dt, null);
+	}
+	public Map<String, Object> formatarDatatable(Map<String, Object> permission, DatatableScaffold dt, Object fatherId) {
+		Map<String, Object> meta = Collections.emptyMap();
+		meta.put("pagination", dt.isPagination());
+		meta.put("searchable", dt.isSearchable());
+		meta.put("ordenate", dt.isOrdenate());
+		meta.put("sortable", dt.isSortable());
+		if (dt.getOrder() != null) {
+			meta.put("order", dt.getOrder() == OrderDatatable.DESC ? "desc" : "asc");
+		}
+		meta.put("sort", dt.getSort());
+		meta.put("title", commonFormat.formatTitle(dt.getTitle()));
+		meta.put("numPaginate", dt.getNumMaxPaginate());
+		meta.put("url", this.formatUrlDataTable(dt.getResourceUrlScaffold(), fatherId));
+		meta.put("columns", this.formatColumns(permission, dt.getColumns(), dt.getClassScaffold()));
+		return meta;
+	}
 
-    def formatarDatatable(def permission, DatatableScaffold dt, def fatherId) {
-        def meta = [:]
-        meta.pagination = dt.pagination
-        meta.searchable = dt.searchable
-        meta.ordenate = dt.ordenate
-        meta.sortable = dt.sortable
-        if (dt.order) {
-            meta.order = dt.order == OrderDatatable.DESC ? "desc" : "asc"
-        }
-        meta.sort = dt.sort
-        meta.title = commonFormat.formatTitle(dt.title)
-        meta.numPaginate = dt.numMaxPaginate
-        meta.url = this.formatUrlDataTable(dt.resourceUrlScaffold, fatherId)
-        meta.columns = this.formatColumns(permission, dt.columns, dt.getClassScaffold())
-        return meta
-    }
+	public List<Map<String, Object>> formatColumns(Map<String, Object> permission, List<CampoDatatable> columns,
+			ClassScaffold ClassScaffold) {
+		List<Map<String, Object>> columnsMeta = Collections.emptyList();
 
-    def formatColumns(def permission, List<CampoDatatable> columns, ClassScaffold ClassScaffold) {
-        def columnsMeta = []
+		for (CampoDatatable campoDatatable : RulesFacade.getInstance().listColumns(permission, columns)) {
+			columnsMeta.add(formatColumn(campoDatatable));
+		}
 
-        RulesFacade.instance.listColumns(permission, columns)?.each {
-            columnsMeta << formatColumn(it)
-        }
+		return columnsMeta;
+	}
 
-        return columnsMeta
-    }
+	public Map<String, Object> formatColumn(CampoDatatable it) {
+		Map<String, Object> columnMeta = Collections.emptyMap();
+		columnMeta.put("name", it.getName());
+		columnMeta.put("title", it.getTitle());
+		columnMeta.put("key", it.getKey());
+		columnMeta.put("length", it.getLength());
+		columnMeta.put("type", getType(it).name());
+		columnMeta.put("order", it.getOrder());
 
-    def formatColumn(CampoDatatable it) {
-        def columnMeta = [name: it.name, title: it.title, key: it.key, length: it.length, type:getType(it).name(), order:it.order]
-        if (it.icon) {
-            columnMeta.icon = commonFormat.formatIcon(it.icon)
-        }
-        columnMeta
-    }
+		if (it.getIcon() != null) {
+			columnMeta.put("icon", commonFormat.formatIcon(it.getIcon()));
+		}
+		return columnMeta;
+	}
 
-    def getType(CampoDatatable campoDatatable){
-        campoDatatable.parent.getClassScaffold()?.fields?.find({it.key==campoDatatable.name})?.type?:TypeFieldScaffold.INPUT
-    }
+	public TypeFieldScaffold getType(CampoDatatable campoDatatable) {
+		for (FieldScaffold fieldScaffold : campoDatatable.getParent().getClassScaffold().getFields()) {
+			if (fieldScaffold.getKey() == campoDatatable.getName()) {
+				return fieldScaffold.getType() != null ? fieldScaffold.getType() : TypeFieldScaffold.INPUT;
+			}
+		}
+		return null;
+	}
 
-    def formatUrlDataTable(ResourceUrlScaffold resourceUrlScaffold, def fatherId) {
-        return resourceUrlScaffold.resolver(TypeActionScaffold.LIST, fatherId).formatUrl()
-    }
+	public Map<String, Object> formatUrlDataTable(ResourceUrlScaffold resourceUrlScaffold, Object fatherId) {
+		return resourceUrlScaffold.resolver(TypeActionScaffold.LIST, fatherId).formatUrl();
+	}
 }

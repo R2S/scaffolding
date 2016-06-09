@@ -1,19 +1,20 @@
-package br.ufscar.sagui.scaffolding.interceptor
+package  biz.r2s.scaffolding.interceptor;
 
-import br.ufscar.sagui.scaffolding.builder.ClassScaffoldBuilder
-import br.ufscar.sagui.scaffolding.format.MenuFormat
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.security.RolesFacade
-import br.ufscar.sagui.util.GrailsUtil
-import grails.rest.Resource
-import grails.util.GrailsNameUtils
+import  biz.r2s.scaffolding.builder.ClassScaffoldBuilder;
+import  biz.r2s.scaffolding.format.MenuFormat;
+import  biz.r2s.scaffolding.meta.ClassScaffold;
+import  biz.r2s.scaffolding.security.RolesFacade;
+import  biz.r2s.util.GrailsUtil;
+import grails.util.GrailsNameUtils;
+
+import java.util.List;
+
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 
 /**
  * Created by raphael on 07/08/15.
  */
-@Resource
-class DomainScaffoldStore {
+public class DomainScaffoldStore {
     static List<DomainResource> domainResources = []
     static String SUFFIX_DEFAULD = "Scaffolding"
 
