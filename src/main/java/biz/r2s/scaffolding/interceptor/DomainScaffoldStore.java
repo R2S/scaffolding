@@ -7,46 +7,58 @@ import  biz.r2s.scaffolding.security.RolesFacade;
 import  biz.r2s.util.GrailsUtil;
 import grails.util.GrailsNameUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 
 /**
  * Created by raphael on 07/08/15.
  */
 public class DomainScaffoldStore {
-    static List<DomainResource> domainResources = []
-    static String SUFFIX_DEFAULD = "Scaffolding"
+    static List<DomainResource> domainResources = Collections.emptyList();
+    static String SUFFIX_DEFAULD = "Scaffolding";
 
-    public static Map obterPorNomeResource(String nome) {
-        return domainResources.find({ it.nomeResource == nome })
+    public static List<DomainResource> obterPorNomeResource(final String nome) {
+        return (List<DomainResource>) CollectionUtils.select(domainResources, new Predicate() {			
+			@Override 
+			public boolean evaluate(Object arg0) {
+				return ((DomainResource)arg0).nomeResource == nome;
+			}
+		});
     }
 
     static String getSuffix(){
-        return this.SUFFIX_DEFAULD
+        return this.SUFFIX_DEFAULD;
     }
+    public static void setDomainResourse(Class domainClass) {
+    	return setDomainResourse(domainClass, null);
+    }
+    
+    public static void setDomainResourse(Class domainClass, String propertyName ) {
 
-    public static void setDomainResourse(GrailsDomainClass domainClass, String propertyName = null ) {
+        DomainResource domainResource = this.getDomainResourse(domainClass, propertyName);
+        ClassScaffold classScaffold = ClassScaffoldBuilder.getInstance().builder(domainClass);
+        MenuFormat menuFormat = new MenuFormat();
 
-        DomainResource domainResource = this.getDomainResourse(domainClass, propertyName)
-        ClassScaffold classScaffold = ClassScaffoldBuilder.instance.builder(domainClass)
-        MenuFormat menuFormat = new MenuFormat()
-
-        def menu = menuFormat.formatMenu(classScaffold.menu)
+        Map menu = menuFormat.formatMenu(classScaffold.getMenu());
 
         if (!domainResource) {
-            domainResource = new DomainResource()
-            domainResource.key = menu.key?:this.getKey(domainClass)
-            domainResource.domainClass = domainClass
-            domainResource.nomeResource = menu.title
-            domainResource.propertyName = propertyName
-            domainResource.url = this.getURL(domainClass, propertyName)
-            domainResource.icon = menu.icon
-            domainResource.root = menu.root
-            domainResource.title = menu.title
-            domainResource.roles = this.getRolesAcess(classScaffold, domainClass, propertyName)
-            domainResource.enabledMenu = classScaffold.menu.enabled
-            domainResources << domainResource
+            domainResource = new DomainResource();
+            domainResource.setKey(menu.get("key")!=null?menu.get("key"):this.getKey(domainClass));
+            domainResource.setDomainClass(domainClass);
+            domainResource.setNomeResource(menu.get("title")); 
+            domainResource.setPropertyName(propertyName);
+            domainResource.setUrl(this.getURL(domainClass, propertyName));
+            domainResource.setIcon(menu.get("icon"));
+            domainResource.setRoot(menu.get("root"));
+            domainResource.setTitle(menu.get("title"));
+            domainResource.setRoles(this.getRolesAcess(classScaffold, domainClass, propertyName));
+            domainResource.setEnabledMenu(classScaffold.getMenu().isEnabled());
+            domainResources.add(domainResource)
         }else{
             domainResource.nomeResource = this.getName(domainClass)
             domainResource.key = menu.key?:this.getKey(domainClass)
