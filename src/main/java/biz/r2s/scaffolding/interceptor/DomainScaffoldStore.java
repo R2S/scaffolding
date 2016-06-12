@@ -1,133 +1,180 @@
-package  biz.r2s.scaffolding.interceptor;
+package biz.r2s.scaffolding.interceptor;
 
-import  biz.r2s.scaffolding.builder.ClassScaffoldBuilder;
-import  biz.r2s.scaffolding.format.MenuFormat;
-import  biz.r2s.scaffolding.meta.ClassScaffold;
-import  biz.r2s.scaffolding.security.RolesFacade;
-import  biz.r2s.util.GrailsUtil;
-import grails.util.GrailsNameUtils;
+import biz.r2s.core.util.NameUtils;
+import biz.r2s.scaffolding.builder.ClassScaffoldBuilder;
+import biz.r2s.scaffolding.format.MenuFormat;
+import biz.r2s.scaffolding.meta.ClassScaffold;
+import biz.r2s.scaffolding.meta.icon.IconScaffold;
+import biz.r2s.scaffolding.security.RolesFacade;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
 
 /**
  * Created by raphael on 07/08/15.
  */
 public class DomainScaffoldStore {
-    static List<DomainResource> domainResources = Collections.emptyList();
-    static String SUFFIX_DEFAULD = "Scaffolding";
+	public static List<DomainResource> domainResources = Collections.emptyList();
+	static String SUFFIX_DEFAULD = "Scaffolding";
 
-    public static List<DomainResource> obterPorNomeResource(final String nome) {
-        return (List<DomainResource>) CollectionUtils.select(domainResources, new Predicate() {			
-			@Override 
+	public static List<DomainResource> obterPorNomeResource(final String nome) {
+		return (List<DomainResource>) CollectionUtils.select(domainResources, new Predicate() {
+			@Override
 			public boolean evaluate(Object arg0) {
-				return ((DomainResource)arg0).nomeResource == nome;
+				return ((DomainResource) arg0).nomeResource == nome;
 			}
 		});
-    }
+	}
 
-    static String getSuffix(){
-        return this.SUFFIX_DEFAULD;
-    }
-    public static void setDomainResourse(Class domainClass) {
-    	return setDomainResourse(domainClass, null);
-    }
-    
-    public static void setDomainResourse(Class domainClass, String propertyName ) {
+	public static String getSuffix() {
+		return SUFFIX_DEFAULD;
+	}
 
-        DomainResource domainResource = this.getDomainResourse(domainClass, propertyName);
-        ClassScaffold classScaffold = ClassScaffoldBuilder.getInstance().builder(domainClass);
-        MenuFormat menuFormat = new MenuFormat();
+	public static void setDomainResourse(Class domainClass) {
+		setDomainResourse(domainClass, null);
+	}
 
-        Map menu = menuFormat.formatMenu(classScaffold.getMenu());
+	public static void setDomainResourse(Class domainClass, String propertyName) {
 
-        if (!domainResource) {
-            domainResource = new DomainResource();
-            domainResource.setKey(menu.get("key")!=null?menu.get("key"):this.getKey(domainClass));
-            domainResource.setDomainClass(domainClass);
-            domainResource.setNomeResource(menu.get("title")); 
-            domainResource.setPropertyName(propertyName);
-            domainResource.setUrl(this.getURL(domainClass, propertyName));
-            domainResource.setIcon(menu.get("icon"));
-            domainResource.setRoot(menu.get("root"));
-            domainResource.setTitle(menu.get("title"));
-            domainResource.setRoles(this.getRolesAcess(classScaffold, domainClass, propertyName));
-            domainResource.setEnabledMenu(classScaffold.getMenu().isEnabled());
-            domainResources.add(domainResource)
-        }else{
-            domainResource.nomeResource = this.getName(domainClass)
-            domainResource.key = menu.key?:this.getKey(domainClass)
-            domainResource.url = this.getURL(domainClass, propertyName)
-            domainResource.icon = menu.icon
-            domainResource.root = menu.root
-            domainResource.title = menu.title
-            domainResource.roles = this.getRolesAcess(classScaffold, domainClass, propertyName)
-            domainResource.enabledMenu = classScaffold.menu.enabled
-        }
-    }
+		DomainResource domainResource = getDomainResourse(domainClass, propertyName);
+		ClassScaffold classScaffold = ClassScaffoldBuilder.getInstance().builder(domainClass);
+		MenuFormat menuFormat = new MenuFormat();
 
-    static getRolesAcess(ClassScaffold classScaffold, GrailsDomainClass domainClass, String propertyName){
-        if(propertyName){
-            return null
-        }
-        RolesFacade rolesFacade = new RolesFacade()
+		Map menu = menuFormat.formatMenu(classScaffold.getMenu());
 
-        def objeto = rolesFacade.getMetaRoles(classScaffold)
+		if (domainResource == null) {
+			domainResource = new DomainResource();
+			domainResource.setKey((String) (menu.get("key") != null ? menu.get("key") : getKey(domainClass)));
+			domainResource.setDomainClass(domainClass);
+			domainResource.setNomeResource((String) menu.get("title"));
+			domainResource.setPropertyName(propertyName);
+			domainResource.setUrl(getURL(domainClass, propertyName));
+			domainResource.setIcon((IconScaffold) menu.get("icon"));
+			domainResource.setRoot((String) menu.get("root"));
+			domainResource.setTitle((String) menu.get("title"));
+			domainResource.setRoles(getRolesAcess(classScaffold, domainClass, propertyName));
+			domainResource.setEnabledMenu(classScaffold.getMenu().isEnabled());
+			domainResources.add(domainResource);
+		} else {
+			domainResource.nomeResource = getName(domainClass);
+			domainResource.setKey((String) (menu.get("key") != null ? menu.get("key") : getKey(domainClass)));
+			domainResource.url = getURL(domainClass, propertyName);
+			domainResource.setIcon((IconScaffold) menu.get("icon"));
+			domainResource.setRoot((String) menu.get("root"));
+			domainResource.setTitle((String) menu.get("title"));
+			domainResource.setRoles(getRolesAcess(classScaffold, domainClass, propertyName));
+			domainResource.setEnabledMenu(classScaffold.getMenu().isEnabled());
+		}
+	}
 
-        return objeto?.roles
-    }
+	static List<String> getRolesAcess(ClassScaffold classScaffold, Class domainClass, String propertyName) {
+		if (propertyName == null) {
+			return null;
+		}
+		RolesFacade rolesFacade = new RolesFacade();
 
-    public static DomainResource getDomainResourse(GrailsDomainClass domainClass, String propertyName = null ){
-        return domainResources.find({ it.domainClass == domainClass && it.propertyName == propertyName})
-    }
+		Map objeto = rolesFacade.getMetaRoles(classScaffold);
 
-    static String getName(GrailsDomainClass domainClass) {
-        return domainClass.name
-    }
+		return (List<String>) objeto.get("roles");
+	}
 
-    static String getKey(GrailsDomainClass domainClass) {
-        return GrailsUtil.getNameModulo(domainClass.clazz)+'-'+GrailsNameUtils.getScriptName(domainClass.clazz)
-    }
+	public static DomainResource getDomainResourse(Class domainClass) {
+		return getDomainResourse(domainClass, null);
 
-    static String getURL(GrailsDomainClass domainClass, String propertyName) {
-        String url = "/${GrailsUtil.getNameModulo(domainClass.clazz)}/" + GrailsNameUtils.getPropertyName(domainClass.clazz) + this.getSuffix()
-        if(propertyName){
-            url = url + "/(*)/" + propertyName
-        }
+	}
 
-        return url
-    }
+	public static DomainResource getDomainResourse(final Class domainClass, final String propertyName) {
+		return (DomainResource) CollectionUtils.find(domainResources, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				DomainResource domainResource = (DomainResource) arg0;
+				return domainResource.getDomainClass().equals(domainClass)
+						&& domainResource.getPropertyName().equals(propertyName);
+			}
+		});
+	}
 
-    static String getURLBase(Class clazz, String propertyName){
-        domainResources?.find({
-            it.domainClass.clazz == clazz && it.propertyName == propertyName
-        })?.url
-    }
+	static String getName(Class domainClass) {
+		return domainClass.getName();
+	}
 
-    static String getPropertyHasManyByUrl(String url) {
-        def list = url.split("/")
-        def num = 0
-        for(int i=0; i < list.size();i++){
-            if(list[i].isNumber()){
-                num = i
-                break
-            }
-        }
-        return num != 0&&list.size()>(num+1)? list[num+1]:null
-    }
+	static String getKey(Class domainClass) {
+		return /* GrailsUtil.getNameModulo(domainClass.clazz)*/"scaffolding"+'-'+ NameUtils.getScriptName(domainClass);
+	}
 
-    static Long getIdByUrl(String url){
-        def list = url.split("/")
-        return list.findAll {it.isNumber()}?.last()?.toLong()
-    }
+	static String getURL(Class domainClass, String propertyName) {
+		String url = /* "/${GrailsUtil.getNameModulo(domainClass.clazz)}/" + */"/scaffolding/"
+				+ NameUtils.getPropertyName(domainClass) + getSuffix();
+		if (propertyName != null) {
+			url = url + "/(*)/" + propertyName;
+		}
 
-    static Long getIdFatherByUrl(String url){
-        def list = url.split("/")
-        return list.findAll {it.isNumber()}?.first()?.toLong()
-    }
+		return url;
+	}
+
+	static String getURLBase(Class clazz, String propertyName) {
+		DomainResource domainResource = getDomainResourse(clazz, propertyName);
+		String url = "";
+		if (domainResource != null) {
+			url = domainResource.getUrl();
+		}
+		return url;
+	}
+
+	static String getPropertyHasManyByUrl(String url) {
+		List<String> list = Arrays.asList(url.split("/"));
+		int num = 0;
+		for (int i = 0; i < list.size(); i++) {
+			if (isNumber(list.get(i))) {
+				num = i;
+				break;
+			}
+		}
+		return num != 0 && list.size() > (num + 1) ? list.get(num + 1) : null;
+	}
+
+	static boolean isNumber(String self) {
+		try {
+			new BigDecimal(self.toString().trim());
+			return true;
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+	}
+
+	static Long getIdByUrl(String url) {
+		List<String> list = Arrays.asList(url.split("/"));
+		int num = 0;
+		for (int i = 0; i < list.size(); i++) {
+			if (isNumber(list.get(i))) {
+				num = i;
+			}
+		}
+
+		if (num != 0) {
+			return Long.parseLong(list.get(num));
+		}
+		return null;
+	}
+
+	static Long getIdFatherByUrl(String url) {
+		List<String> list = Arrays.asList(url.split("/"));
+		int num = 0;
+		for (int i = 0; i < list.size(); i++) {
+			if (isNumber(list.get(i))) {
+				num = i;
+				break;
+			}
+		}
+		if (num != 0) {
+			return Long.parseLong(list.get(num));
+		}
+		return null;
+	}
 }

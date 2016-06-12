@@ -24,13 +24,13 @@ import biz.r2s.scaffolding.meta.field.params.Select2ParamsFieldScaffold;
 /**
  * Created by raphael on 28/07/15.
  */
-class FieldClassExtractor {
+public class FieldClassExtractor {
 
     private DatatableClassExtrator datatableClassBuilder = new DatatableClassExtrator();
 
     private ActionsClassExtractor actionsClassBuilder = new ActionsClassExtractor();
 
-    List<FieldScaffold> getFields(Class domainClass, ClassScaffold classScaffold) {
+    public List<FieldScaffold> getFields(Class domainClass, ClassScaffold classScaffold) {
         List<FieldScaffold> fieldScaffolds = Collections.EMPTY_LIST;
         int count = 0;
         for (Field field: domainClass.getFields()) {

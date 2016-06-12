@@ -1,53 +1,43 @@
-package br.ufscar.sagui.scaffolding.interceptor
+package biz.r2s.scaffolding.interceptor;
 
-import br.ufscar.sagui.scaffolding.extractor.clazz.FieldClassExtractor
-import br.ufscar.sagui.scaffolding.mapping.MappingScaffoldFacade
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.scaffolding.meta.field.FieldScaffold
-import br.ufscar.sagui.util.GrailsUtil
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import java.util.List;
+
+import biz.r2s.scaffolding.extractor.clazz.FieldClassExtractor;
+import biz.r2s.scaffolding.mapping.MappingScaffoldFacade;
+import biz.r2s.scaffolding.meta.ClassScaffold;
+import biz.r2s.scaffolding.meta.field.FieldScaffold;
 
 /**
  * Created by raphael on 07/08/15.
  */
 class ScaffoldInterceptor {
 
-
     public static void intercept(){
-
-        for (GrailsDomainClass domainClass: GrailsUtil.getGrailsApplication().getDomainClasses()){
+        for (Class domainClass: getDomainClass()){
             if(isScaffold(domainClass)){
-                DomainScaffoldStore.setDomainResourse(domainClass)
-
-                this.getFieldHasMany(domainClass)?.each {
-                    DomainScaffoldStore.setDomainResourse(domainClass, it.key)
+                DomainScaffoldStore.setDomainResourse(domainClass);
+                List<FieldScaffold> fieldHasMany = getFieldHasMany(domainClass);
+                for(FieldScaffold fieldScaffold:fieldHasMany){
+                	DomainScaffoldStore.setDomainResourse(domainClass, fieldScaffold.getKey());
                 }
             }
         }
-        MappingScaffoldFacade.getInstance().mapped()
+        MappingScaffoldFacade.getInstance().mapped();
+    }
+    
+    static List<Class> getDomainClass(){
+    	return null;
     }
 
-    static boolean isScaffold(GrailsDomainClass domainClass)
+    static boolean isScaffold(Class domainClass)
     {
-        try{
-            def scaffolding = domainClass.clazz.scaffolding
-            if(scaffolding!=null){
-                if(scaffolding.class.asBoolean()){
-                    return scaffolding
-                }else{
-                    return true
-                }
-            }
-        }catch (e){
-            return false
-        }
+    	return true;
     }
 
-    static List<FieldScaffold> getFieldHasMany(GrailsDomainClass domainClass){
-        FieldClassExtractor fieldClassExtractor = new FieldClassExtractor()
-        ClassScaffold classScaffold = new ClassScaffold()
-        classScaffold.fields = fieldClassExtractor.getFields(domainClass, null)
-        return classScaffold.fieldHasMany
+    static List<FieldScaffold> getFieldHasMany(Class domainClass){
+        FieldClassExtractor fieldClassExtractor = new FieldClassExtractor();
+        ClassScaffold classScaffold = new ClassScaffold();
+        classScaffold.setFields(fieldClassExtractor.getFields(domainClass, null));
+        return classScaffold.getFieldHasMany();
     }
 }

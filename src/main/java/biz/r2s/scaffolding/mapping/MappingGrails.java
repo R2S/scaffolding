@@ -1,17 +1,11 @@
-package br.ufscar.sagui.scaffolding.mapping
-
-import br.ufscar.sagui.util.GrailsUtil
+package biz.r2s.scaffolding.mapping;
 
 /**
  * Created by raphael on 13/08/15.
  */
-class MappingGrails {
-    def getGrailsUrlMappingsHolder() {
-        return GrailsUtil.getGrailsApplication().mainContext.grailsUrlMappingsHolder
-    }
-
-    def addMapping(String url, String resource, Class resourceClass, String phm, String controller) {
-        this.getGrailsUrlMappingsHolder().addMappings({
+public class MappingGrails {
+    public void addMapping(String url, String resource, Class resourceClass, String phm, String controller) {
+        /*this.getGrailsUrlMappingsHolder().addMappings({
             "${url}/(*)/descendentes"(controller: controller, action: "descendentes", method: "GET"){
                 resourceName = resourceClass.name
                 propertyHasMany = phm
@@ -48,7 +42,7 @@ class MappingGrails {
                 resourceName = resourceClass.name
                 propertyHasMany = phm
             }
-        })
+        })*/
     }
 
 

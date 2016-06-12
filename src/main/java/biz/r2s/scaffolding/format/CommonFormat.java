@@ -17,7 +17,7 @@ import biz.r2s.scaffolding.meta.icon.TypeIcon;
  * Created by raphael on 11/08/15.
  */
 public class CommonFormat {
-    String formatTitle(TitleScaffold ts){
+	public String formatTitle(TitleScaffold ts){
         return "$ts.name${ts.subTitle?' ('+ts.subTitle+')':''}";
     }
 
@@ -32,7 +32,7 @@ public class CommonFormat {
         return TypeIcon.format(iconScaffold.getType(), iconScaffold.getName());
     }
 
-    Map formatActions(Map permission, ActionsScaffold actionsScaffold, ResourceUrlScaffold resourceUrlScaffold, Object fatherId ){
+    public Map formatActions(Map permission, ActionsScaffold actionsScaffold, ResourceUrlScaffold resourceUrlScaffold, Object fatherId ){
         Map meta = Collections.emptyMap();
         
         meta.put("create",null);

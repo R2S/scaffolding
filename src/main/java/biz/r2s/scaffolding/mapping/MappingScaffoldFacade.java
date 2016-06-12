@@ -1,87 +1,90 @@
-package br.ufscar.sagui.scaffolding.mapping
+package biz.r2s.scaffolding.mapping;
 
-import br.ufscar.sagui.core.crud.SaguiHasManyRestfulController
-import br.ufscar.sagui.core.crud.SaguiRestfulController
-import br.ufscar.sagui.scaffolding.builder.ClassScaffoldBuilder
-import br.ufscar.sagui.scaffolding.interceptor.DomainResource
-import br.ufscar.sagui.scaffolding.interceptor.DomainScaffoldStore
-import br.ufscar.sagui.scaffolding.meta.ClassScaffold
-import br.ufscar.sagui.util.GrailsUtil
-import org.codehaus.groovy.grails.commons.GrailsControllerClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsStringUtils
+import java.util.List;
+
+import biz.r2s.scaffolding.builder.ClassScaffoldBuilder;
+import biz.r2s.scaffolding.interceptor.DomainResource;
+import biz.r2s.scaffolding.interceptor.DomainScaffoldStore;
+import biz.r2s.scaffolding.meta.ClassScaffold;;
 
 /**
  * Created by raphael on 13/08/15.
  */
-class MappingScaffoldFacade {
-    private MappingGrails mappingGrails
+public class MappingScaffoldFacade {
+    private MappingGrails mappingGrails;
 
-    static MappingScaffoldFacade _instance
+    static MappingScaffoldFacade _instance;
 
     public MappingScaffoldFacade(){
-        mappingGrails = new MappingGrails()
+        mappingGrails = new MappingGrails();
     }
-    static MappingScaffoldFacade getInstance(){
-        if(!_instance){
-            _instance = new MappingScaffoldFacade()
+    public static MappingScaffoldFacade getInstance(){
+        if(_instance==null){
+            _instance = new MappingScaffoldFacade();
         }
-        return _instance
+        return _instance;
     }
 
-    def mapped(){
-        this.addAll(DomainScaffoldStore.domainResources)
+    public void mapped(){
+        this.addAll(DomainScaffoldStore.domainResources);
     }
 
-    def addAll(List<DomainResource> domainResources){
-        domainResources?.each {
-            this.add(it)
-        }
+    void addAll(List<DomainResource> domainResources){
+    	for(DomainResource domainResource:domainResources){
+    		 this.add(domainResource);
+    	}
     }
 
-    def add(DomainResource domainResource){
-        mappingGrails.addMapping(domainResource.url, this.getResources(domainResource.domainClass, domainResource.propertyName), domainResource.domainClass.clazz, domainResource.propertyName, this.getController(domainResource.domainClass, domainResource.propertyName))
+    void add(DomainResource domainResource){
+        mappingGrails.addMapping(domainResource.getUrl(), this.getResources(domainResource.getDomainClass(), domainResource.getPropertyName()), domainResource.getDomainClass(), domainResource.getPropertyName(), this.getController(domainResource.getDomainClass(), domainResource.getPropertyName()));
     }
 
-    def getResources(GrailsDomainClass domainClass, String propertyName){
-        String resource = "defaultScaffoldRest"
-        GrailsControllerClass controllerClassDomain = this.getControllerClassDomain(domainClass, propertyName)
-        if(controllerClassDomain){
-            SaguiRestfulController bean = GrailsUtil.grailsApplication.mainContext.getBean(controllerClassDomain.clazz)
-            resource = bean.resourceName
+    String getResources(Class domainClass, String propertyName){
+        String resource = "defaultScaffoldRest";
+        Class controllerClassDomain = this.getControllerClassDomain(domainClass, propertyName);
+        if(controllerClassDomain!=null){
+            /*SaguiRestfulController bean = GrailsUtil.grailsApplication.mainContext.getBean(controllerClassDomain.clazz)
+            resource = bean.resourceName*/
         }
-        return resource
+        return resource;
     }
-    def getController(GrailsDomainClass domainClass, String propertyName){
-        String controller = "defaultScaffoldRest"
-        GrailsControllerClass controllerClassDomain = this.getControllerClassDomain(domainClass, propertyName)
-        if(controllerClassDomain){
-            controller = this.getNameController(controllerClassDomain.clazz.simpleName)
+    String getController(Class domainClass, String propertyName){
+        String controller = "defaultScaffoldRest";
+        Class controllerClassDomain = this.getControllerClassDomain(domainClass, propertyName);
+        if(controllerClassDomain!=null){
+            controller = this.getNameController(controllerClassDomain.getSimpleName());
         }
-        return controller
+        return controller;
     }
 
     String getNameController(String nameSimplesClassController){
-        return GrailsStringUtils.uncapitalize(nameSimplesClassController.replace("Controller", ""));
+    	StringBuilder sb = new StringBuilder(nameSimplesClassController.replace("Controller", ""));
+    	sb.setCharAt(0, Character.toLowerCase(sb.charAt(0)));
+    	return sb.toString();
     }
 
-    static GrailsControllerClass getControllerClassDomain(GrailsDomainClass domainClass, String propertyName){
-        DomainResource domainResource = DomainScaffoldStore.getDomainResourse(domainClass, propertyName)
-         return this.getControllerClassDomain(domainResource)
+    static Class getControllerClassDomain(Class domainClass, String propertyName){
+        DomainResource domainResource = DomainScaffoldStore.getDomainResourse(domainClass, propertyName);
+         return getControllerClassDomain(domainResource);
     }
     
-    static GrailsControllerClass getControllerClassDomain( DomainResource domainResource){
-        GrailsControllerClass controllerClassDomain = null
-        ClassScaffold classScaffold = ClassScaffoldBuilder.instance.builder(domainResource.getDomainClassResourse())
-        if(classScaffold.controllerClass){
-            Class aClass = Class.forName(classScaffold.controllerClass)
-            controllerClassDomain = GrailsUtil.getGrailsApplication().getControllerClasses().find{it.clazz==aClass}
+    static Class getControllerClassDomain( DomainResource domainResource){
+    	Class controllerClassDomain = null;
+        ClassScaffold classScaffold = ClassScaffoldBuilder.getInstance().builder(domainResource.getDomainClassResourse());
+        if(classScaffold.getControllerClass()!=null){
+            try {
+				Class aClass = Class.forName(classScaffold.getControllerClass());
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            //controllerClassDomain = GrailsUtil.getGrailsApplication().getControllerClasses().find{it.clazz==aClass}
         }
-        return controllerClassDomain
+        return controllerClassDomain;
     }
 
 
-    static boolean isBean(GrailsDomainClass domainClass, String propertyName, SaguiRestfulController bean){
+    /*static boolean isBean(Class domainClass, String propertyName, SaguiRestfulController bean){
         try{
             if(bean.resource == domainClass.clazz){
                 if(propertyName) {
@@ -96,5 +99,5 @@ class MappingScaffoldFacade {
         }catch(e){
             return false
         }
-    }
+    }*/
 }

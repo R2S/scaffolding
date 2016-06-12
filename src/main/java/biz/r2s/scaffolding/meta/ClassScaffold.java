@@ -32,7 +32,7 @@ public class ClassScaffold {
         this.status = status;
     }
 
-    List<FieldScaffold> getFieldHasMany(){
+    public List<FieldScaffold> getFieldHasMany(){
         List<FieldScaffold> fieldsHM = new ArrayList<FieldScaffold>();
         for(FieldScaffold fieldScaffold:fields){
         	if(fieldScaffold.isTypeHasMany()){
