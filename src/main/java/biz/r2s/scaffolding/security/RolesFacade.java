@@ -16,9 +16,9 @@ import biz.r2s.scaffolding.meta.security.PermissionField;
  * Created by raphael on 02/09/15.
  */
 public class RolesFacade {
-	private Map<TypeActionScaffold, List<String>> actionMethods = Collections.emptyMap();
+	private Map<TypeActionScaffold, List<String>> actionMethods = new java.util.HashMap();
 
-	private Map<TypeActionScaffold, String> actionPermissionDefaults = Collections.emptyMap();
+	private Map<TypeActionScaffold, String> actionPermissionDefaults = new java.util.HashMap();
 
 	public RolesFacade() {
 
@@ -47,7 +47,7 @@ public class RolesFacade {
 	}
 
 	public Map<String, Object> getRolesDefault(Class domain) {
-		Map<String, Object> roles = Collections.emptyMap();
+		Map<String, Object> roles = new java.util.HashMap();
 		for(List<String> methods:actionMethods.values()){
 			for(String method:methods){
 				roles.put(method, this.getRoleDefault(domain, method));
@@ -108,7 +108,7 @@ public class RolesFacade {
 	}
 
 	public Map<String, Object> getMetaRoles(ClassScaffold classScaffold) {
-		Map<String, Object> meta = Collections.emptyMap();
+		Map<String, Object> meta = new java.util.HashMap();
         meta.putAll(this.getMetaRolesClass(classScaffold));
         meta.put("actions", this.getMetaRolesActions(classScaffold));
         meta.put("fields", this.getMetaRolesFields(classScaffold));
@@ -117,13 +117,13 @@ public class RolesFacade {
     }
 
 	public Map<String, Object> getMetaRolesClass(ClassScaffold classScaffold) {
-		Map<String, Object> obj = Collections.emptyMap();
+		Map<String, Object> obj = new java.util.HashMap();
 		obj.put("roles", this.getRolesClass(classScaffold, null));
         return obj;
     }
 
 	public Map<String, Object> getMetaRolesActions(ClassScaffold classScaffold) {
-		Map<String, Object> meta = Collections.emptyMap();
+		Map<String, Object> meta = new java.util.HashMap();
         if (classScaffold!=null) {
             changeMetaRolesAction(meta, TypeActionScaffold.CREATE, classScaffold);
             changeMetaRolesAction(meta, TypeActionScaffold.EDIT, classScaffold);
@@ -137,15 +137,15 @@ public class RolesFacade {
 	public void changeMetaRolesAction(Map<String, Object> meta, TypeActionScaffold typeActionScaffold, ClassScaffold classScaffold) {
 
         ActionScaffold actionScaffold = classScaffold.getActions().getAction(typeActionScaffold);
-        Map<String, Object> metaAction = Collections.emptyMap();
-        List<String> roles = Collections.emptyList();
+        Map<String, Object> metaAction = new java.util.HashMap();
+        List<String> roles = new java.util.ArrayList();
         roles.addAll(this.getRolesAction(actionScaffold, typeActionScaffold, classScaffold));
         metaAction.put("roles", roles);        
         meta.put(typeActionScaffold.toString(), metaAction);
     }
 
 	public Map<String, Object> getMetaRolesButtons(ClassScaffold classScaffold) {
-		Map<String, Object> meta = Collections.emptyMap();
+		Map<String, Object> meta = new java.util.HashMap();
 		for(Button button:classScaffold.getButtons()){
 			meta.put(button.getName(), getMetaRolesButton(classScaffold, button));
 		}
@@ -153,7 +153,7 @@ public class RolesFacade {
     }
 
 	public List<String> getMetaRolesButton(ClassScaffold classScaffold, Button button) {
-		List<String> roles = Collections.emptyList();
+		List<String> roles = new java.util.ArrayList();
         if (button.getPermission()!=null && button.getPermission().getRoles()!=null) {
             roles = button.getPermission().getRoles();
         } else {
@@ -163,7 +163,7 @@ public class RolesFacade {
     }
 
 	public Map<String, Object> getMetaRolesFields(ClassScaffold classScaffold) {
-		Map<String, Object> meta = Collections.emptyMap();
+		Map<String, Object> meta = new java.util.HashMap();
         for(FieldScaffold field:classScaffold.getFields()){
         	meta.put(field.getKey(), getMetaRolesField(classScaffold, field.getPermission()));
         }
@@ -171,10 +171,10 @@ public class RolesFacade {
     }
 
 	public Map<String, Object> getMetaRolesField(ClassScaffold classScaffold, PermissionField permissionField) {
-		Map<String, Object> meta = Collections.emptyMap();
+		Map<String, Object> meta = new java.util.HashMap();
 		boolean acl = false;
-		List<String> roles = Collections.emptyList();
-		Map<String, Object> actionRoles = Collections.emptyMap();
+		List<String> roles = new java.util.ArrayList();
+		Map<String, Object> actionRoles = new java.util.HashMap();
 		
         if (permissionField!=null) {
         	roles.addAll(permissionField.getRoles());
@@ -192,8 +192,11 @@ public class RolesFacade {
     }
 
 	public List<String> getRolesFieldAction(ClassScaffold classScaffold, PermissionField field, TypeActionScaffold typeActionScaffold) {
-		List<String> roles = Collections.emptyList();
-        List<String> roleAction = field.getActionRoles().get(typeActionScaffold);
+		List<String> roles = new java.util.ArrayList();
+        List<String> roleAction = null;
+        if(field!=null&&field.getActionRoles()!=null){
+        	roleAction = field.getActionRoles().get(typeActionScaffold);
+        }
         if (roleAction!=null) {
             roles = roleAction;
         } else {
@@ -203,8 +206,8 @@ public class RolesFacade {
     }
 
 	public List<String> getRolesField(ClassScaffold classScaffold, PermissionField field, TypeActionScaffold typeActionScaffold) {
-		List<String> roles = Collections.emptyList();
-        if (field.getRoles()!=null) {
+		List<String> roles = new java.util.ArrayList();
+        if (field!=null&&field.getRoles()!=null) {
             roles = field.getRoles();
         } else {
             roles = getRolesAction(classScaffold, typeActionScaffold);
@@ -217,8 +220,8 @@ public class RolesFacade {
     }
 
 	public List<String> getRolesAction(ActionScaffold actionScaffold, TypeActionScaffold typeActionScaffold, ClassScaffold classScaffold) {
-		List<String> roles = Collections.emptyList();
-        if (actionScaffold.getPermission().getRoles()!=null) {
+		List<String> roles = new java.util.ArrayList();
+        if (actionScaffold.getPermission()!=null&&actionScaffold.getPermission().getRoles()!=null) {
             roles = actionScaffold.getPermission().getRoles();
         } else {
             roles = getRolesClass(classScaffold, typeActionScaffold);
@@ -227,8 +230,8 @@ public class RolesFacade {
     }
 
 	public List<String> getRolesClass(ClassScaffold classScaffold, TypeActionScaffold typeActionScaffold) {
-		List<String> roles = Collections.emptyList();
-        if (classScaffold.getPermission().getRoles()!=null) {
+		List<String> roles = new java.util.ArrayList();
+        if (classScaffold.getPermission()!=null&&classScaffold.getPermission().getRoles()!=null) {
             roles = classScaffold.getPermission().getRoles();
         } else if (typeActionScaffold!=null) {
             roles.add(getRoleDefault(classScaffold.getClazz(), typeActionScaffold));

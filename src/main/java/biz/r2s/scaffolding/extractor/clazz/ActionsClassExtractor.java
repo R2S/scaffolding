@@ -2,6 +2,7 @@ package  biz.r2s.scaffolding.extractor.clazz;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import  biz.r2s.scaffolding.meta.action.TypeActionScaffold;
  */
 public class ActionsClassExtractor {
 	public List<String> keyTitleAction = Arrays.asList(":name.:action.title", ":action.title");
-    public Map<TypeActionScaffold, String> actionsToName = Collections.emptyMap();
+    public Map<TypeActionScaffold, String> actionsToName = new HashMap();
 
     public ActionsClassExtractor(){
         actionsToName.put(TypeActionScaffold.CREATE,"create");

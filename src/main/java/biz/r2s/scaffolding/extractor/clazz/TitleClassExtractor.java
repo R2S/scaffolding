@@ -3,6 +3,7 @@ package  biz.r2s.scaffolding.extractor.clazz;
 import java.util.Arrays;
 import java.util.List;
 
+import biz.r2s.core.util.NameUtils;
 import  biz.r2s.scaffolding.meta.TitleScaffold;
 
 /**
@@ -29,7 +30,7 @@ public class TitleClassExtractor {
             }
         }*/
 
-        titleScaffold.setName(prefixoTitle!=null?prefixoTitle+" ":""+domainClass.getName());
+        titleScaffold.setName(prefixoTitle!=null?prefixoTitle+" ":""+NameUtils.getNaturalName(domainClass.getSimpleName()));
 
         return titleScaffold;
     }

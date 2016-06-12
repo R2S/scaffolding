@@ -15,7 +15,7 @@ public class MenuFormat {
     }
 
     public Map formatMenu(MenuScaffold menuScaffold){
-        Map meta = Collections.emptyMap();
+        Map meta = new java.util.HashMap();
         meta.put("root", menuScaffold.getRoot());
         meta.put("title", commonFormat.formatTitle(menuScaffold.getTitle()));
         meta.put("icon", commonFormat.formatIcon(menuScaffold.getIcon()));

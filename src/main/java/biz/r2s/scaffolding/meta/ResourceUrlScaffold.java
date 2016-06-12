@@ -3,6 +3,7 @@ package biz.r2s.scaffolding.meta;
 import biz.r2s.scaffolding.interceptor.DomainScaffoldStore;
 import biz.r2s.scaffolding.meta.action.TypeActionScaffold;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.persistence.metamodel.EntityType;
@@ -91,7 +92,13 @@ public class ResourceUrlScaffold {
 
         String urlPath = tratarUrlFather(getUrlPath() + urlBase, fatherId);
 
-        URL url = new URL(urlPath);
+        URL url = null;
+		try {
+			url = new URL(urlPath);
+		} catch (MalformedURLException e) {
+			System.err.println(e);
+			System.err.println(urlPath);
+		}
 
         return resolver(action, url, fatherId);
     }
@@ -110,8 +117,14 @@ public class ResourceUrlScaffold {
     
     public static ResourceUrl resolver(TypeActionScaffold action, String urlStr, Object fatherId) {
         ResourceUrl resourceUrl = new ResourceUrl();
-
-        resourceUrl.setUrl(new URL(urlStr));
+        URL url = null;
+        try {
+        	url = new URL(urlStr);			
+		} catch (MalformedURLException e) {
+			System.err.println(e);
+			System.err.println(urlStr);
+		}
+        resourceUrl.setUrl(url);
         resourceUrl.setHttpMethod(getHttpMethod(action));
 
         return resourceUrl;
@@ -167,4 +180,5 @@ public class ResourceUrlScaffold {
         return url;
     }
 }
+
 

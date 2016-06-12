@@ -17,7 +17,7 @@ import biz.r2s.core.util.ObjectUtil;
 /**
  * Created by raphael on 30/07/15.
  */
-class DatatableClassExtrator {
+public class DatatableClassExtrator {
 
     static final List<String> FIELDS_EXCLUDE = Arrays.asList("version");
 
@@ -55,9 +55,9 @@ class DatatableClassExtrator {
     }
 
     private List<CampoDatatable> getColumns(Class domainClass, DatatableScaffold dataTable) {
-        List<CampoDatatable> campos = Collections.emptyList();
+        List<CampoDatatable> campos = new java.util.ArrayList();
         int count = 0;
-        for(Field field: domainClass.getFields()){
+        for(Field field: domainClass.getDeclaredFields()){
             if(validateColumn(field)){
                 count++;
                 CampoDatatable campo = new CampoDatatable();

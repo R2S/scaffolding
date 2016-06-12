@@ -24,7 +24,7 @@ public class ResourceUrl {
     }
     
     static public Map<String, Object>  formatUrl(String url, HttpMethod httpMethod1, boolean relative){
-    	Map<String, Object> map = Collections.emptyMap();
+    	Map<String, Object> map = new java.util.HashMap();
     	map.put("path", getUrlRelative(url));
     	map.put("action", httpMethod1.toString());
         return map;

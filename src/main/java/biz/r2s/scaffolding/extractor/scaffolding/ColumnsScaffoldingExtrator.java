@@ -23,7 +23,7 @@ public class ColumnsScaffoldingExtrator {
 		Object value = datatableMap.get("columns");
 		if ((boolean) value) {
 			int count = 0;
-			List<CampoDatatable> campoDatatables = Collections.emptyList();
+			List<CampoDatatable> campoDatatables = new java.util.ArrayList();
 			if (value instanceof List) {
 				List<String> valueList = (List<String>) value;
 

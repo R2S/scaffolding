@@ -32,6 +32,6 @@ public class MenuClassExtrator {
     }
 
     String getRoot(Class domainClass){
-        return "";
+        return "scaffolding";
     }
 }

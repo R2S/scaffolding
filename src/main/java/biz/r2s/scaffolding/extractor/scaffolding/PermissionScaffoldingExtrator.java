@@ -65,7 +65,7 @@ class PermissionScaffoldingExtrator {
     }
 
     List<String> getRoles(Object permissionRolesScaffolding){
-    	List<String> roles = Collections.emptyList();
+    	List<String> roles = new java.util.ArrayList();
         if(permissionRolesScaffolding instanceof String){
             roles.add((String) permissionRolesScaffolding);
         }else if(permissionRolesScaffolding instanceof List){

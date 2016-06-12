@@ -19,7 +19,7 @@ public class DomainResource {
 	List<String> roles;
 	String root;
 	String title;
-	IconScaffold icon;
+	Map icon;
 	boolean enabledMenu;
 
 	public boolean isHasMamy() {
@@ -40,8 +40,8 @@ public class DomainResource {
 	}
 
 	public static Map<String, Object> formatMenu(String key, String name, String url, List<String> rules, String root,
-			IconScaffold icon) {
-		Map<String, Object> menu = Collections.emptyMap();
+			Map icon) {
+		Map<String, Object> menu = new java.util.HashMap();
 		menu.put("key", key);
 		menu.put("url", url);
 		menu.put("name", name);
@@ -122,11 +122,11 @@ public class DomainResource {
 		this.title = title;
 	}
 
-	public IconScaffold getIcon() {
+	public Map getIcon() {
 		return icon;
 	}
 
-	public void setIcon(IconScaffold icon) {
+	public void setIcon(Map icon) {
 		this.icon = icon;
 	}
 

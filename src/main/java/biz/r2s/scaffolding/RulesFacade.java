@@ -21,12 +21,12 @@ import biz.r2s.scaffolding.security.PermissionFacade;
  */
 public class RulesFacade {
 
-    static List<String> FIELD_EXCLUDE_CREATE = Collections.emptyList();
-    static List<String> FIELD_INCLUDE_CREATE = Collections.emptyList();
-    static List<String> FIELD_EXCLUDE_EDIT = Collections.emptyList();
-    static List<String> FIELD_INCLUDE_EDIT = Collections.emptyList();
-    static List<String> FIELD_EXCLUDE_LIST = Collections.emptyList();
-    static List<String> FIELD_INCLUDE_LIST = Collections.emptyList();
+    static List<String> FIELD_EXCLUDE_CREATE = new java.util.ArrayList();
+    static List<String> FIELD_INCLUDE_CREATE = new java.util.ArrayList();
+    static List<String> FIELD_EXCLUDE_EDIT = new java.util.ArrayList();
+    static List<String> FIELD_INCLUDE_EDIT = new java.util.ArrayList();
+    static List<String> FIELD_EXCLUDE_LIST = new java.util.ArrayList();
+    static List<String> FIELD_INCLUDE_LIST = new java.util.ArrayList();
 
     static RulesFacade _instance;
 
@@ -68,7 +68,7 @@ public class RulesFacade {
 
 
     public Map<FieldScaffold, Boolean> getFieldsCreate(Map<String, Object> permission, List<FieldScaffold> fields) {
-        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = Collections.emptyMap();
+        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = new java.util.HashMap();
         for(FieldScaffold field:fields){
            if (!(FIELD_EXCLUDE_CREATE.contains(field.getKey())) && (hasPermissionField(permission, field, TypeActionScaffold.CREATE) || FIELD_INCLUDE_CREATE.contains(field.getKey()))) {
                     fieldScaffoldBooleanMap.put(field, !field.isInsertable());
@@ -82,7 +82,7 @@ public class RulesFacade {
     }
 
     public Map<FieldScaffold, Boolean> getFieldsEdit(Map<String, Object> permission, List<FieldScaffold> fields) {
-        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = Collections.emptyMap();
+        Map<FieldScaffold, Boolean> fieldScaffoldBooleanMap = new java.util.HashMap();
         for( FieldScaffold field: fields){
             if(!(FIELD_EXCLUDE_EDIT.contains(field.getKey()))){
                 if (hasPermissionField(permission, field, TypeActionScaffold.EDIT) || FIELD_INCLUDE_EDIT.contains(field.getKey())) {
@@ -96,7 +96,7 @@ public class RulesFacade {
     }
 
     public List<FieldScaffold> getFieldsShow(Map<String, Object> permission, List<FieldScaffold> fields) {
-        List<FieldScaffold> fieldScaffolds = Collections.emptyList();
+        List<FieldScaffold> fieldScaffolds = new java.util.ArrayList();
         for(FieldScaffold field: fields){
         	if (hasPermissionField(permission, field, TypeActionScaffold.VIEW) || hasPermissionField(permission, field, TypeActionScaffold.CREATE) || hasPermissionField(permission, field, TypeActionScaffold.EDIT)) {
                 if(!field.isTypeHasMany()&&field.getType()!=TypeFieldScaffold.STATIC){
@@ -112,7 +112,7 @@ public class RulesFacade {
     	return getButtons(permission, buttons, null);
     }
     public Map<PositionButton, List<Button>> getButtons(Map<String, Object> permission, List<Button> buttons, TypeActionScaffold typeActionScaffold) {
-        Map<PositionButton, List<Button>> buttonScaffolds = Collections.emptyMap();
+        Map<PositionButton, List<Button>> buttonScaffolds = new java.util.HashMap();
         List<PositionButton> positionsButtons = PositionButton.listByTypeActionScaffold(typeActionScaffold);
         List<Button> buttonsFilter = filterButtons((Map<TypeActionScaffold, Boolean>) permission.get("buttons"), typeActionScaffold, buttons);
         for(Button button:buttonsFilter){
@@ -133,25 +133,25 @@ public class RulesFacade {
     }
     
     private List<Button> filterButtons(Map<TypeActionScaffold, Boolean> actionsPermission, TypeActionScaffold typeActionScaffold, List<Button> buttons){
-    	List<Button> buttonsFilter = Collections.emptyList();
+    	List<Button> buttonsFilter = new java.util.ArrayList();
     	for(Button button: buttons){
     		
-    		List<TypeActionScaffold> typeActionScaffolds = Collections.emptyList();
+    		List<TypeActionScaffold> typeActionScaffolds = new java.util.ArrayList();
     		
     		for(PositionButton positionButton: button.getPositionsButton()){
     			typeActionScaffolds.add(positionButton.getTypeActionScaffold());
     		}   				
     		
-    		if(actionsPermission.get(button.getActionScaffold()) &&  (typeActionScaffold!=null && typeActionScaffolds.contains(typeActionScaffold))){
+    		//if(actionsPermission==null || actionsPermission.get(button.getActionScaffold()) &&  (typeActionScaffold!=null && typeActionScaffolds.contains(typeActionScaffold))){
     			buttonsFilter.add(button);
-    		}
+    		//}
     	}
     	return buttonsFilter;
     }
     
 
     public Map<String, TypeActionScaffold> getActions(Map<String, Object> permission) {
-        Map<String, TypeActionScaffold> actionScaffoldMap = Collections.emptyMap();
+        Map<String, TypeActionScaffold> actionScaffoldMap = new java.util.HashMap();
         Map<String, Boolean> actions = (Map<String, Boolean>) permission.get("actions");
         
         for(String key:actions.keySet()){
@@ -257,10 +257,10 @@ public class RulesFacade {
     }
 
     public boolean enablePermission(){
-        return true;
+        return false;
     }
 
     public boolean enablePermissionMenu(){
-        return true;
+        return false;
     }
 }

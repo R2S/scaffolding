@@ -2,12 +2,14 @@ package  biz.r2s.scaffolding.extractor.clazz;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import biz.r2s.core.util.NameUtils;
 import  biz.r2s.scaffolding.meta.ClassScaffold;
 import  biz.r2s.scaffolding.meta.action.ActionsScaffold;
 import  biz.r2s.scaffolding.meta.field.FieldScaffold;
@@ -31,9 +33,9 @@ public class FieldClassExtractor {
     private ActionsClassExtractor actionsClassBuilder = new ActionsClassExtractor();
 
     public List<FieldScaffold> getFields(Class domainClass, ClassScaffold classScaffold) {
-        List<FieldScaffold> fieldScaffolds = Collections.EMPTY_LIST;
+        List<FieldScaffold> fieldScaffolds = new ArrayList();
         int count = 0;
-        for (Field field: domainClass.getFields()) {
+        for (Field field: domainClass.getDeclaredFields()) {
         	count++;
         	fieldScaffolds.add(this.getFieldScaffold(field, classScaffold, count+1000));
         }
@@ -47,7 +49,7 @@ public class FieldClassExtractor {
 
         fieldScaffold.setKey(field.getName());
         fieldScaffold.setElementId(this.getId(grailsClass, field));
-        fieldScaffold.setLabel(field.getName());
+        fieldScaffold.setLabel(NameUtils.getNaturalName(field.getName()));
         fieldScaffold.setInsertable(true);
         fieldScaffold.setUpdateable(true);
         this.changeTypeAndParams(field, fieldScaffold);
@@ -62,7 +64,7 @@ public class FieldClassExtractor {
     }
 
     String getId(Class grailsClass, Field field) {
-        return grailsClass.getName()+"."+field.getName();
+        return grailsClass.getSimpleName()+"."+field.getName();
     }
 
     void changeTypeAndParams(Field field, FieldScaffold fieldScaffold) {
@@ -95,12 +97,12 @@ public class FieldClassExtractor {
             typeFieldScaffold = TypeFieldScaffold.FILE;
             paramsFieldScaffold = new FileParamsFieldScaffold();
             ((FileParamsFieldScaffold) paramsFieldScaffold).setRequired(false);
-        } else if (field.isEnumConstant()) {
+        } /*else if (field.isEnumConstant()) {
             typeFieldScaffold = TypeFieldScaffold.SELECT2;
             paramsFieldScaffold = new Select2ParamsFieldScaffold();
             ((Select2ParamsFieldScaffold) paramsFieldScaffold).setDataTextField("text");
             ((Select2ParamsFieldScaffold) paramsFieldScaffold).setDataValueField("id");
-            List<Object> options = Collections.emptyList();
+            List<Object> options = new java.util.ArrayList();
             for(Enum it:(clazz).values()){
             	Map<String, Object> map = Collections.EMPTY_MAP;
             	map.put("id", it.toString());
@@ -109,7 +111,7 @@ public class FieldClassExtractor {
             }
 	        ((Select2ParamsFieldScaffold)paramsFieldScaffold).setOptions(options);
 	        ((Select2ParamsFieldScaffold)paramsFieldScaffold).setRequired(true);
-        }/*else if(property.referencedDomainClass){
+        }else if(property.referencedDomainClass){
             return this.getTypeAndParamsAssocition(property, fieldScaffold)
         }*/
         paramsFieldScaffold.setParent(fieldScaffold);

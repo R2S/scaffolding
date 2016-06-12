@@ -24,7 +24,7 @@ public class ButtonFormat {
     }
 
     public Map formatButtons(Map permission, List<Button> buttons, TypeActionScaffold actionScaffold, final Object fatherId) {
-        Map positionButtonMeta = Collections.emptyMap();
+        Map positionButtonMeta = new java.util.HashMap();
 
         Map<PositionButton, List<Button>> buttonsPositions = RulesFacade.getInstance().getButtons(permission, buttons, actionScaffold);
         for(PositionButton positionButton:buttonsPositions.keySet()){
@@ -69,7 +69,7 @@ public class ButtonFormat {
     }
 
     Map formatButtonBasic(Button button){
-    	Map meta = Collections.emptyMap();
+    	Map meta = new java.util.HashMap();
         meta.put("name", button.getName());
         meta.put("label", button.getLabel());
         meta.put("type", button.getType().toString());
@@ -82,21 +82,21 @@ public class ButtonFormat {
     }
 
     Map formatButtonAction(ButtonAction button, Object fatherId){
-    	Map meta = Collections.emptyMap();
+    	Map meta = new java.util.HashMap();
         meta.put("url", this.formatUrlActionButton(button, fatherId));
         meta.put("confirmation",button.getConfirmation());
         return meta;
     }
 
     Map formatButtonRedirect(ButtonRedirect button, Object fatherId){
-    	Map meta = Collections.emptyMap();
+    	Map meta = new java.util.HashMap();
         meta.put("rota", button.getRota());
         return meta;
     }
 
     Map formatButtonInternal(ButtonInternal button, Object fatherId){
-    	Map meta = Collections.emptyMap();
-    	Map function = Collections.emptyMap();
+    	Map meta = new java.util.HashMap();
+    	Map function = new java.util.HashMap();
     	function.put("params",button.getFunction());
     	function.put("name", button.getParams());
         meta.put("function", function); 
@@ -104,7 +104,7 @@ public class ButtonFormat {
     }
 
     Map formatButtonHasManyEdit(ButtonHasManyEdit button, Object fatherId){
-        return Collections.emptyMap();
+        return new java.util.HashMap();
     }
 
 }

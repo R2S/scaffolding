@@ -39,7 +39,7 @@ public class InputParamsFieldScaffold implements ParamsFieldScaffold {
     }
 
     @Override
-    public boolean validate(HashMap<String, Object> params) {
+    public boolean validate(Map<String, Object> params) {
         if (params!=null) {
             if (campos.containsAll(campos)) {
                 return false;

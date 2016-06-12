@@ -11,7 +11,7 @@ public class ButtonAction extends Button{
     Boolean confirmation;
 
     @Override
-    ButtonType getType() {
+	public ButtonType getType() {
         return ButtonType.ACTION;
     }
 

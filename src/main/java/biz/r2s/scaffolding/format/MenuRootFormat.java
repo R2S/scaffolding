@@ -29,7 +29,7 @@ public class MenuRootFormat {
 
 	public List<Map> formatMenus(List<Map> menus) {
 		Map<String, List<Map>> menuGroupByRoot = menuGroupByRoot(menus);
-		List menusList = Collections.emptyList();
+		List menusList = new java.util.ArrayList();
 		for (String key : menuGroupByRoot.keySet()) {
 			List<Map> value = menuGroupByRoot.get(key);
 			Map obj = getMenuRoot(key);
@@ -57,13 +57,13 @@ public class MenuRootFormat {
 	}
 
 	Map<String, List<Map>> menuGroupByRoot(List<Map> menus) {
-		Map<String, List<Map>> menusRoot = Collections.emptyMap();
+		Map<String, List<Map>> menusRoot = new java.util.HashMap();
 		for (Map mapMenu : menus) {
 			if (menusRoot.containsKey(mapMenu.get("root"))) {
 				List<Map> maps = menusRoot.get(mapMenu.get("root"));
 				maps.add(mapMenu);
 			} else {
-				List<Map> maps = Collections.emptyList();
+				List<Map> maps = new java.util.ArrayList();
 				maps.add(mapMenu);
 				menusRoot.put((String) mapMenu.get("root"), maps);
 			}
@@ -73,7 +73,7 @@ public class MenuRootFormat {
 	}
 
 	public Map getMenuRoot(String key) {
-		Map meta = Collections.emptyMap();
+		Map meta = new java.util.HashMap();
 		meta.put("name", this.getNameMenu(key));
 		meta.put("key", key);
 		meta.put("icon", getIconMenu(key));

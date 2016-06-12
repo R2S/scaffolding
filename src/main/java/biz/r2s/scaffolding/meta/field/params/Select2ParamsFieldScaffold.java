@@ -10,7 +10,7 @@ import biz.r2s.scaffolding.meta.field.TypeFieldScaffold;
  */
 public class Select2ParamsFieldScaffold extends InputParamsFieldScaffold {
 
-	List<Object> options = Collections.emptyList();
+	List<Object> options = new java.util.ArrayList();
 	String dataTextField = "text";
 	String dataValueField = "id";
 	boolean multiple = false;

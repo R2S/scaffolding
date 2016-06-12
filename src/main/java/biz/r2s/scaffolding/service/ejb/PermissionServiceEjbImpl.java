@@ -4,11 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
+
 import biz.r2s.scaffolding.meta.ClassScaffold;
 import biz.r2s.scaffolding.meta.action.TypeActionScaffold;
 import biz.r2s.scaffolding.security.PermissionFacade;
 import biz.r2s.scaffolding.service.PermissionService;
-
+@Stateless
+@LocalBean
 public class PermissionServiceEjbImpl implements PermissionService{
 	private PermissionFacade  permissionFacade;
 

@@ -52,7 +52,7 @@ public enum PositionButton {
 	}
 	
 	public static List<PositionButton> listByTypeActionScaffold(TypeActionScaffold actionScaffold){
-		List<PositionButton> positionButtons = Collections.emptyList();
+		List<PositionButton> positionButtons = new java.util.ArrayList();
 		for(PositionButton positionButton: PositionButton.values()){
 			if(positionButton.getTypeActionScaffold() == actionScaffold){
 				positionButtons.add(positionButton);

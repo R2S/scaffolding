@@ -23,7 +23,7 @@ public class StaticParamsFieldScaffold implements ParamsFieldScaffold {
 	FieldScaffold parent;
 
     @Override
-    public boolean validate(HashMap<String,Object> params) {
+    public boolean validate(Map<String,Object> params) {
     	return true;
     }
 
@@ -34,6 +34,6 @@ public class StaticParamsFieldScaffold implements ParamsFieldScaffold {
     
     @Override
     public Map<String, Object> format() {
-    	return Collections.emptyMap();
+    	return new java.util.HashMap();
     }
 }

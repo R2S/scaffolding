@@ -102,7 +102,7 @@ public class ClassUtils {
         Method[] metodos = classe.getMethods();
 
         for(Method metodo:metodos){
-            if(metodo.getAnnotation(anootationClass)){
+            if(metodo.getAnnotation(anootationClass) != null){
                 metodoRetorno = metodo;
             }
         }

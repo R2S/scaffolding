@@ -18,13 +18,13 @@ import biz.r2s.scaffolding.meta.icon.TypeIcon;
  */
 public class CommonFormat {
 	public String formatTitle(TitleScaffold ts){
-        return "$ts.name${ts.subTitle?' ('+ts.subTitle+')':''}";
+        return ts.getName()+(ts.getSubTitle()!=null?" ("+ts.getSubTitle()+")":"");
     }
 
     public Map formatIcon(IconScaffold iconScaffold){
-    	Map map = Collections.emptyMap();
+    	Map map = new java.util.HashMap();
     	map.put("class", getClassIcon(iconScaffold));
-    	map.put("position",iconScaffold.getPosition().name().toLowerCase());
+    	map.put("position",iconScaffold.getPosition()!=null?iconScaffold.getPosition().name().toLowerCase():null);
     	return map;
     }
 
@@ -33,7 +33,7 @@ public class CommonFormat {
     }
 
     public Map formatActions(Map permission, ActionsScaffold actionsScaffold, ResourceUrlScaffold resourceUrlScaffold, Object fatherId ){
-        Map meta = Collections.emptyMap();
+        Map meta = new java.util.HashMap();
         
         meta.put("create",null);
         meta.put("edit",null);
@@ -43,7 +43,7 @@ public class CommonFormat {
         Map<String, TypeActionScaffold> actions = RulesFacade.getInstance().getActions(permission);
         for(String nomeAction:actions.keySet()){
         	TypeActionScaffold typeActionScaffold =  actions.get(nomeAction);
-        	ActionScaffold actionScaffold = (ActionScaffold) ObjectUtil.getValue("nomeAction", actionsScaffold);
+        	ActionScaffold actionScaffold = (ActionScaffold) ObjectUtil.getValue(nomeAction, actionsScaffold);
         	if(actionScaffold.isEnabled()){
         		meta.put(nomeAction,formatAction(actionScaffold, resourceUrlScaffold, typeActionScaffold, fatherId));
         	}        	
@@ -57,7 +57,7 @@ public class CommonFormat {
             return null;
         }
 
-    	Map meta = Collections.emptyMap();
+    	Map meta = new java.util.HashMap();
         meta.put("title",this.formatTitle(actionScaffold.getTitle()));
         meta.put("url",resourceUrlScaffold.resolver(typeActionScaffold, fatherId).formatUrl());
         return meta;

@@ -3,6 +3,9 @@ package biz.r2s.scaffolding.service.ejb;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 
@@ -21,7 +24,8 @@ import biz.r2s.scaffolding.meta.datatatable.DatatableScaffold;
 import biz.r2s.scaffolding.meta.field.FieldScaffold;
 import biz.r2s.scaffolding.meta.field.params.DataTableParamsFieldScaffold;
 import biz.r2s.scaffolding.security.PermissionFacade;
-
+@Stateless
+@LocalBean
 public class MetaServiceEjbImpl {
 	CommonFormat commonFormat;
 	DatatableFormat datatableFormat;
@@ -41,7 +45,7 @@ public class MetaServiceEjbImpl {
 
 	public Map getMetaList(Class domainClass, String propertyName, Object fatherId) {
 		ClassScaffold classScaffold = getMeta(domainClass);
-		Map meta = Collections.emptyMap();
+		Map meta = new java.util.HashMap();
 		if (classScaffold != null) {
 			Map config = getConfigsMeta(domainClass, propertyName, fatherId, classScaffold, TypeActionScaffold.LIST);
 			ActionsScaffold actions = (ActionsScaffold) config.get("actions");
@@ -58,7 +62,7 @@ public class MetaServiceEjbImpl {
 			meta.put("dataTable", datatableFormat.formatarDatatable((Map) config.get("permission"),
 					(DatatableScaffold) config.get("datatableScaffold"), fatherId));
 
-			if (!(Boolean) config.get("isHasMany")) {
+			if (config.get("isHasMany")!=null&&!(Boolean) config.get("isHasMany")) {
 				dataTableMap.put("title", meta.get("title"));
 			}
 
@@ -73,7 +77,7 @@ public class MetaServiceEjbImpl {
 
 	public Map getMetaCreate(Class domainClass, String propertyName, Object fatherId) {
 		ClassScaffold classScaffold = getMeta(domainClass);
-		Map meta = Collections.emptyMap();
+		Map meta = new java.util.HashMap();
 		if (classScaffold != null) {
 			Map config = getConfigsMeta(domainClass, propertyName, fatherId, classScaffold, TypeActionScaffold.CREATE);
 			ActionsScaffold actions = (ActionsScaffold) config.get("actions");
@@ -99,7 +103,7 @@ public class MetaServiceEjbImpl {
 
 	public Map getMetaEdit(Class domainClass, String propertyName, Object fatherId) {
 		ClassScaffold classScaffold = getMeta(domainClass);
-		Map meta = Collections.emptyMap();
+		Map meta = new java.util.HashMap();
 		if (classScaffold != null) {
 			Map config = getConfigsMeta(domainClass, propertyName, fatherId, classScaffold, TypeActionScaffold.EDIT);
 			ActionsScaffold actions = (ActionsScaffold) config.get("actions");
@@ -125,7 +129,7 @@ public class MetaServiceEjbImpl {
 
 	public Map getMetaShow(Class domainClass, String propertyName, Object fatherId) {
 		ClassScaffold classScaffold = getMeta(domainClass);
-		Map meta = Collections.emptyMap();
+		Map meta = new java.util.HashMap();
 		if (classScaffold != null) {
 			Map config = getConfigsMeta(domainClass, propertyName, fatherId, classScaffold, TypeActionScaffold.VIEW);
 			ActionsScaffold actions = (ActionsScaffold) config.get("actions");
@@ -193,7 +197,7 @@ public class MetaServiceEjbImpl {
 			datatableScaffold = classScaffold.getDatatable();
 			classScaffoldAction = classScaffold;
 		}
-		Map meta = Collections.emptyMap();
+		Map meta = new java.util.HashMap();
 
 		meta.put("actions", actions);
 		meta.put("datatableScaffold", datatableScaffold);

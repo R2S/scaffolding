@@ -28,7 +28,7 @@ public class PermissionFacade {
     
     public Map<String, Object> getPermissionScaffold(ClassScaffold classScaffold, List<TypeActionScaffold> actions, List<String> fields, List<Button> buttons) {
     	Map<String, Object> metaRolesClass = rolesFacade.getMetaRoles(classScaffold);
-        Map<String, Object>  permission = Collections.emptyMap();
+        Map<String, Object>  permission = new java.util.HashMap();
         permission.put("fields", getPermissionScaffoldField(metaRolesClass, actions, fields));
         permission.put("actions", getPermissionScaffoldAction(metaRolesClass, actions));
         permission.put("buttons", getPermissionScaffoldButton(metaRolesClass, buttons));
@@ -37,19 +37,19 @@ public class PermissionFacade {
 
     public Map<String, Object>  getPermissionScaffoldField(
     		Map<String, Object> metaRolesClass, List<TypeActionScaffold> actions, List<String> fields) {
-    	Map<String, Object> permissionFields = Collections.emptyMap();
+    	Map<String, Object> permissionFields = new java.util.HashMap();
     	Map<String, Object> fieldsMap = (Map<String, Object>) metaRolesClass.get("fields");
         for(String key:fieldsMap.keySet()){
         	if((fields!=null && fields.contains(key)) || fields==null){
-        		Map<String, Object>  metaField = Collections.emptyMap();
+        		Map<TypeActionScaffold, Object>  metaField = new java.util.HashMap();
         		List<TypeActionScaffold> listActions = Arrays.asList(TypeActionScaffold.CREATE, TypeActionScaffold.EDIT, TypeActionScaffold.VIEW, TypeActionScaffold.LIST);
         		if (actions!=null) {
                     listActions = actions;
                 }
         		for(TypeActionScaffold action:listActions){
         			Map<String, Object> value = (Map<String, Object>) fieldsMap.get(key);
-        			Map<String, Object> actionRoles = (Map<String, Object>) value.get("actionRoles");
-        			metaField.put(action, isPermission((Map<String, Object>) actionRoles.get(action)));
+        			Map<TypeActionScaffold, Object> actionRoles = (Map<TypeActionScaffold, Object>) value.get("actionRoles");
+        			metaField.put(action, isPermission(actionRoles.get(action)));
         		}
         		permissionFields.put(key, metaField);
          
@@ -59,13 +59,13 @@ public class PermissionFacade {
     }
 
     public Map<String, Object> getPermissionScaffoldAction(Map<String, Object> metaRolesClass, List<TypeActionScaffold> actions) {
-    	Map<String, Object> permissionAction = Collections.emptyMap();
+    	Map<String, Object> permissionAction = new java.util.HashMap();
     	Map<String, Object> actionsMap = (Map<String, Object>) metaRolesClass.get("actions");
         for(String key:actionsMap.keySet()){
         	if ((actions!=null && (actions.contains(key)))
                     || actions==null) {
         		Map<String, Object> value = (Map<String, Object>) actionsMap.get(key);
-        		permissionAction.put(key, isPermission((Map<String, Object>) value
+        		permissionAction.put(key, isPermission(value
         				.get("roles")));
         		
         	}
@@ -74,19 +74,19 @@ public class PermissionFacade {
     }
 
     public Map<String, Object> getPermissionScaffoldButton(Map<String, Object> metaRolesClass, List<Button> buttons) {
-    	Map<String, Object> permissionButton = Collections.emptyMap();
+    	Map<String, Object> permissionButton = new java.util.HashMap();
     	Map<String, Object> buttonsMap = (Map<String, Object>) metaRolesClass.get("buttons");
     	 for(String key:buttonsMap.keySet()){
          	if ((buttons!=null && (buttons.contains(key)))
                      || buttons==null) {
-         		permissionButton.put(key, isPermission((Map<String, Object>) buttonsMap.get(key)));
+         		permissionButton.put(key, isPermission(buttonsMap.get(key)));
          	}    	
         }
         return permissionButton;
 
     }
 
-    public boolean isPermission(Map<String, Object> roles) {
+    public boolean isPermission(Object list) {
         if(!RulesFacade.getInstance().enablePermission()){
             return true;
         }        

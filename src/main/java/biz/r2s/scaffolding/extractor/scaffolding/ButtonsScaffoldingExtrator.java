@@ -188,7 +188,7 @@ public class ButtonsScaffoldingExtrator {
     public void changePosition(Map<String, Object> buttonScaffolding, Button button) {
         List<String> positionsValue = (List<String>) buttonScaffolding.get("positions");
         if (positionsValue!=null && positionsValue instanceof Collection) {
-            List<PositionButton> positionButtons = Collections.emptyList();
+            List<PositionButton> positionButtons = new java.util.ArrayList();
             for (String position : positionsValue) {
                 PositionButton positionButton = PositionButton.getPosition(position);
                 if (positionButton!=null) {

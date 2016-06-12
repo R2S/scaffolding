@@ -2,6 +2,7 @@ package  biz.r2s.scaffolding.extractor.clazz;
 
 import java.util.List;
 
+import biz.r2s.core.util.NameUtils;
 import  biz.r2s.scaffolding.extractor.MetaDomainExtractor;
 import  biz.r2s.scaffolding.meta.ClassScaffold;
 import  biz.r2s.scaffolding.meta.MenuScaffold;
@@ -53,7 +54,7 @@ public class ClazzExtractor implements MetaDomainExtractor {
     }
 
     String getName(Class domainClass) {
-        return domainClass.getName();
+        return NameUtils.getNaturalName(domainClass.getSimpleName());
     }
 
     ActionsScaffold getActions(Class domainClass, ClassScaffold classScaffold) {

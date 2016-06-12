@@ -31,7 +31,7 @@ public class DatatableFormat {
 		return formatarDatatable(permission, dt, null);
 	}
 	public Map<String, Object> formatarDatatable(Map<String, Object> permission, DatatableScaffold dt, Object fatherId) {
-		Map<String, Object> meta = Collections.emptyMap();
+		Map<String, Object> meta = new java.util.HashMap();
 		meta.put("pagination", dt.isPagination());
 		meta.put("searchable", dt.isSearchable());
 		meta.put("ordenate", dt.isOrdenate());
@@ -49,7 +49,7 @@ public class DatatableFormat {
 
 	public List<Map<String, Object>> formatColumns(Map<String, Object> permission, List<CampoDatatable> columns,
 			ClassScaffold ClassScaffold) {
-		List<Map<String, Object>> columnsMeta = Collections.emptyList();
+		List<Map<String, Object>> columnsMeta = new java.util.ArrayList();
 
 		for (CampoDatatable campoDatatable : RulesFacade.getInstance().listColumns(permission, columns)) {
 			columnsMeta.add(formatColumn(campoDatatable));
@@ -59,7 +59,7 @@ public class DatatableFormat {
 	}
 
 	public Map<String, Object> formatColumn(CampoDatatable it) {
-		Map<String, Object> columnMeta = Collections.emptyMap();
+		Map<String, Object> columnMeta = new java.util.HashMap();
 		columnMeta.put("name", it.getName());
 		columnMeta.put("title", it.getTitle());
 		columnMeta.put("key", it.getKey());

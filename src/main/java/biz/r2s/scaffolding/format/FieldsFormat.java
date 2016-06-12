@@ -35,8 +35,8 @@ public class FieldsFormat {
     	return formatFieldsAndHasMany(permission, classScaffold, fieldScaffolds, actionScaffold, null);
     }
     public Map formatFieldsAndHasMany(Map permission, ClassScaffold classScaffold, List<FieldScaffold> fieldScaffolds, TypeActionScaffold actionScaffold, Class fatherClass){
-        List listFieldsMeta = Collections.emptyList();
-        List listHasManyMeta = Collections.emptyList();
+        List listFieldsMeta = new java.util.ArrayList();
+        List listHasManyMeta = new java.util.ArrayList();
         if(actionScaffold == TypeActionScaffold.CREATE){
         	Map<FieldScaffold, Boolean> fieldsPermission = RulesFacade.getInstance().getFieldsCreate(permission, fieldScaffolds);
         	for(FieldScaffold field: fieldsPermission.keySet()){
@@ -55,7 +55,7 @@ public class FieldsFormat {
         		addFieldsAndHasMany(listFieldsMeta, listHasManyMeta, fatherClass, field, true);
         	}
         }
-        Map meta = Collections.emptyMap();
+        Map meta = new java.util.HashMap();
         meta.put("fields", listFieldsMeta);
         meta.put("hasMany", listHasManyMeta);        
         return meta;
@@ -74,8 +74,8 @@ public class FieldsFormat {
     void formatFieldsHasMany(List listFieldsMeta, FieldScaffold field, boolean readonly){
         Field field2 = ObjectUtil.getField(field.getKey(), field.getParent().getClazz());
         String name = field.getLabel();
-        String url;
-        String key;
+        String url = null;
+        String key = null;
         if(field2!=null){
             ResourceUrl resourceUrl = ResourceUrlScaffold.builder(field2.getDeclaringClass(), field.getKey()).resolver(TypeActionScaffold.LIST);
             url = commonFormat.tratarUrl((String) resourceUrl.formatUrl().get("path"));
@@ -91,7 +91,7 @@ public class FieldsFormat {
     }
 
     Map formatField(FieldScaffold fieldScaffold){
-    	Map meta = Collections.emptyMap();
+    	Map meta = new java.util.HashMap();
         meta.put("key",fieldScaffold.getKey());
         meta.put("label",fieldScaffold.getLabel());
         meta.put("id",fieldScaffold.getElementId());

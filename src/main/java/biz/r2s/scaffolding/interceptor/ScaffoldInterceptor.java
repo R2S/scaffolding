@@ -1,16 +1,18 @@
 package biz.r2s.scaffolding.interceptor;
 
+import java.util.Arrays;
 import java.util.List;
 
 import biz.r2s.scaffolding.extractor.clazz.FieldClassExtractor;
 import biz.r2s.scaffolding.mapping.MappingScaffoldFacade;
 import biz.r2s.scaffolding.meta.ClassScaffold;
 import biz.r2s.scaffolding.meta.field.FieldScaffold;
+import br.com.techne.cadastro.model.Pessoa;
 
 /**
  * Created by raphael on 07/08/15.
  */
-class ScaffoldInterceptor {
+public class ScaffoldInterceptor {
 
     public static void intercept(){
         for (Class domainClass: getDomainClass()){
@@ -26,7 +28,7 @@ class ScaffoldInterceptor {
     }
     
     static List<Class> getDomainClass(){
-    	return null;
+    	return Arrays.asList(Pessoa.class);
     }
 
     static boolean isScaffold(Class domainClass)
