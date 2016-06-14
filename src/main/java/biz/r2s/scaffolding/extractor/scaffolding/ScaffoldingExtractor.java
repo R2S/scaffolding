@@ -48,7 +48,7 @@ public class ScaffoldingExtractor implements MetaDomainExtractor {
 					classScaffold.setStatus(
 							(boolean) configScaffolding ? StatusClassScaffold.ACTIVE : StatusClassScaffold.DISABLE);
 				} else {
-					Map classScaffolding = (Map) classScaffold;
+					Map classScaffolding = (Map) configScaffolding;
 					this.changeName(classScaffolding, classScaffold);
 					this.changeTitle(classScaffolding, classScaffold);
 					this.actionsScaffoldingExtrator.changeActions(classScaffolding, classScaffold);
@@ -58,12 +58,11 @@ public class ScaffoldingExtractor implements MetaDomainExtractor {
 					this.changeService(classScaffolding, classScaffold);
 					this.changeController(classScaffolding, classScaffold);
 					this.buttonsScaffoldingExtrator.changeAndInsertButtons(classScaffolding, classScaffold);
-					int count = 0;
-					for (FieldScaffold fieldScaffold : classScaffold.getFields()) {
+					for (int i = 0; i < classScaffold.getFields().size(); i++) {
+						FieldScaffold fieldScaffold = classScaffold.getFields().get(i);
 						Object fieldScaffolding = classScaffolding.get(fieldScaffold.getKey());
-						count++;
 						if (fieldScaffolding != null) {
-							fieldScaffold.setOrder(count);
+							fieldScaffold.setOrder(i);
 							if (fieldScaffolding instanceof Boolean) {
 								fieldScaffold.setScaffold((boolean) fieldScaffolding);
 							} else if (fieldScaffolding instanceof Number) {
@@ -71,11 +70,8 @@ public class ScaffoldingExtractor implements MetaDomainExtractor {
 							} else if (fieldScaffolding instanceof String) {
 								fieldScaffold.setLabel((String) fieldScaffolding);
 							} else {
-
 								fieldScaffoldingExtractor.changeConfigField((Map) fieldScaffolding, fieldScaffold);
-
 							}
-
 						}
 					}
 					this.changeMenu(classScaffolding, classScaffold);
@@ -88,7 +84,7 @@ public class ScaffoldingExtractor implements MetaDomainExtractor {
 		return classScaffold;
 	}
 
-	Object getConfigScaffoldind(Class domainClass) {
+	protected Object getConfigScaffoldind(Class domainClass) {
 		return null; // this.getClosureScaffoldind(domainClass.clazz)
 	}
 

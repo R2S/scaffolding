@@ -26,7 +26,7 @@ public class ParamsScaffoldingExtrator {
     }
 	
 	void copyParams(ParamsFieldScaffold origem, ParamsFieldScaffold destino){
-		//TODO:FAZER
+		
 	}
 
 	public void changeTypeAndParamsFields(Map fieldScaffolding, FieldScaffold fieldScaffold) throws Exception {
@@ -34,6 +34,7 @@ public class ParamsScaffoldingExtrator {
         Map<String, Object> paramsConfig = this.getParams(fieldScaffolding);
         if (type != null) {
             fieldScaffold.setType(type);
+            System.out.println(fieldScaffold.getType());
             ParamsFieldScaffold params = ParamsFactory.factory(type);
             if (fieldScaffold.getType() == TypeFieldScaffold.SELECT2_AJAX) {
                 Class domain = fieldScaffold.getParent().getClazz();
@@ -43,7 +44,8 @@ public class ParamsScaffoldingExtrator {
                 		}
             }
             if (!fieldScaffold.getParams().getClass().equals(params.getClass())) {
-            	copyParams(params, fieldScaffold.getParams());
+            	fieldScaffold.setParams(params);
+            	//copyParams(params, fieldScaffold.getParams());
             }
         }
 

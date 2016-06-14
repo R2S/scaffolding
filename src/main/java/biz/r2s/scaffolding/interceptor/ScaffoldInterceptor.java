@@ -1,5 +1,6 @@
 package biz.r2s.scaffolding.interceptor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import br.com.techne.cadastro.model.Pessoa;
 public class ScaffoldInterceptor {
 
     public static void intercept(){
+    	System.out.println("intercept:");
         for (Class domainClass: getDomainClass()){
             if(isScaffold(domainClass)){
                 DomainScaffoldStore.setDomainResourse(domainClass);
@@ -28,12 +30,13 @@ public class ScaffoldInterceptor {
     }
     
     static List<Class> getDomainClass(){
-    	return Arrays.asList(Pessoa.class);
+    	System.out.println("intercept:"+ExtratorClassStore.extract());
+    	return ExtratorClassStore.extract();
     }
 
     static boolean isScaffold(Class domainClass)
     {
-    	return true;
+    	return ExtratorClassStore.isScaffold(domainClass);
     }
 
     static List<FieldScaffold> getFieldHasMany(Class domainClass){

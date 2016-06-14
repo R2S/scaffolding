@@ -1,6 +1,7 @@
 package biz.r2s.scaffolding.builder;
 
 import  biz.r2s.scaffolding.extractor.clazz.ClazzExtractor;
+import biz.r2s.scaffolding.extractor.json.JSONExtractor;
 import  biz.r2s.scaffolding.extractor.scaffolding.ScaffoldingExtractor;
 import  biz.r2s.scaffolding.meta.ClassScaffold;
 
@@ -10,12 +11,14 @@ import  biz.r2s.scaffolding.meta.ClassScaffold;
 public class ClassScaffoldBuilder {
     private ClazzExtractor clazzExtractor;
     private ScaffoldingExtractor scaffoldingExtractor;
+    private JSONExtractor jsonExtractor;
     private static ClassScaffoldBuilder _instance;
 
 
     public ClassScaffoldBuilder() {
         this.clazzExtractor = new ClazzExtractor();
         this.scaffoldingExtractor = new ScaffoldingExtractor();
+        this.jsonExtractor = new JSONExtractor();
     }
 
     public static ClassScaffoldBuilder getInstance() {
@@ -33,7 +36,7 @@ public class ClassScaffoldBuilder {
         classScaffol.setHasMany(isHasMany);
         this.popularMetaByClass(domainClass, classScaffol);
         this.popularMetaByScaffold(domainClass, classScaffol);
-
+        this.popularMetaByJSON(domainClass, classScaffol);
         return classScaffol;
     }
 
@@ -43,5 +46,9 @@ public class ClassScaffoldBuilder {
 
     private void popularMetaByScaffold(Class domainClass, ClassScaffold classScaffold) {
         scaffoldingExtractor.extractor(domainClass, classScaffold);
+    }
+    
+    private void popularMetaByJSON(Class domainClass, ClassScaffold classScaffold) {
+    	jsonExtractor.extractor(domainClass, classScaffold);
     }
 }

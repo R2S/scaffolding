@@ -1,7 +1,9 @@
 package biz.r2s.core.crud.controller.ejb.impl;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.ws.rs.DELETE;
@@ -31,9 +33,10 @@ public abstract class GenericControllerEjbImpl<T extends BaseModel<V>, V extends
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listObject() {
 		try {
+			Map map = new HashMap();
 			List<T> arrayList = this.getService().list();
-
-			return Response.ok(arrayList).build();//
+			map.put("data", arrayList);
+			return Response.ok(map).build();//
 		} catch (Exception e) {
 			return Response.serverError().build();
 		}

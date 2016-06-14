@@ -19,30 +19,30 @@ public class ClassUtils {
     private ClassUtils() {
     }
 
-    private static void checkDirectory(File directory, String pckgname, List<Class<?>> classes) throws ClassNotFoundException {
+    private static void checkDirectory(File directory, String pckgname, List<Class<?>> classes, String extension) throws ClassNotFoundException {
         File tmpDirectory;
 
         if (directory.exists() && directory.isDirectory()) {
             final String[] files = directory.list();
 
             for (final String file : files) {
-                if (file.endsWith(".class")) {
+                if (file.endsWith(extension)) {
                     try {
-                        classes.add(Class.forName(pckgname + '.' + file.substring(0, file.length() - 6)));
+                        classes.add(Class.forName(pckgname + '.' + file.split("\\.")[0]));
                     } catch (final NoClassDefFoundError e) {
                         e.fillInStackTrace();
                     }
                 } else {
                     tmpDirectory = new File(directory, file);
                     if (tmpDirectory.isDirectory()) {
-                        checkDirectory(tmpDirectory, pckgname + "." + file, classes);
+                        checkDirectory(tmpDirectory, pckgname + "." + file, classes, extension);
                     }
                 }
             }
         }
     }
 
-    private static void checkJarFile(JarURLConnection connection, String pckgname, List<Class<?>> classes) throws ClassNotFoundException, IOException {
+    private static void checkJarFile(JarURLConnection connection, String pckgname, List<Class<?>> classes, String extension) throws ClassNotFoundException, IOException {
         final JarFile jarFile = connection.getJarFile();
         final Enumeration<JarEntry> entries = jarFile.entries();
         String name;
@@ -50,7 +50,7 @@ public class ClassUtils {
         for (JarEntry jarEntry = null; entries.hasMoreElements() && ((jarEntry = entries.nextElement()) != null);) {
             name = jarEntry.getName();
 
-            if (name.contains(".class")) {
+            if (name.contains(extension)) {
                 name = name.substring(0, name.length() - 6).replace('/', '.');
 
                 if (name.contains(pckgname)) {
@@ -59,8 +59,10 @@ public class ClassUtils {
             }
         }
     }
-
     public static List<Class<?>> getClassesForPackage(String pckgname) throws ClassNotFoundException {
+    	return getClassesForPackage(pckgname, ".class");
+    }
+    public static List<Class<?>> getClassesForPackage(String pckgname, String extension) throws ClassNotFoundException {
         final List<Class<?>> classes = new ArrayList<Class<?>>();
 
         try {
@@ -77,9 +79,9 @@ public class ClassUtils {
                 connection = url.openConnection();
 
                 if (connection instanceof JarURLConnection) {
-                    checkJarFile((JarURLConnection) connection, pckgname, classes);
+                    checkJarFile((JarURLConnection) connection, pckgname, classes, extension);
                 } else {
-                    checkDirectory(new File(URLDecoder.decode(url.getPath(), "UTF-8")), pckgname, classes);
+                    checkDirectory(new File(URLDecoder.decode(url.getPath(), "UTF-8")), pckgname, classes, extension);
                 }
             }
         } catch (final NullPointerException ex) {

@@ -23,12 +23,11 @@ public class InputParamsFieldScaffold implements ParamsFieldScaffold {
     String keypress;
     boolean required;
     FieldScaffold parent;
-
-    public InputParamsFieldScaffold(){
-        campos = Arrays.asList("mask", "classes", "helpBlock", "placeholder", "autofocus", "tabindex", "keypress", "required");
-    }
-
     private List<String> campos = new ArrayList<String>();
+    
+    public InputParamsFieldScaffold(){
+        campos.addAll(Arrays.asList("mask", "classes", "helpBlock", "placeholder", "autofocus", "tabindex", "keypress", "required"));
+    }  
 
     public void setCampos(String campoNovo) {
        campos.add(campoNovo);
