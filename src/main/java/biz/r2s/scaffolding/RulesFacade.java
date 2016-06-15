@@ -21,12 +21,12 @@ import biz.r2s.scaffolding.security.PermissionFacade;
  */
 public class RulesFacade {
 
-    static List<String> FIELD_EXCLUDE_CREATE = new java.util.ArrayList();
-    static List<String> FIELD_INCLUDE_CREATE = new java.util.ArrayList();
-    static List<String> FIELD_EXCLUDE_EDIT = new java.util.ArrayList();
-    static List<String> FIELD_INCLUDE_EDIT = new java.util.ArrayList();
-    static List<String> FIELD_EXCLUDE_LIST = new java.util.ArrayList();
-    static List<String> FIELD_INCLUDE_LIST = new java.util.ArrayList();
+    static List<String> FIELD_EXCLUDE_CREATE = new java.util.ArrayList<String>();
+    static List<String> FIELD_INCLUDE_CREATE = new java.util.ArrayList<String>();
+    static List<String> FIELD_EXCLUDE_EDIT = new java.util.ArrayList<String>();
+    static List<String> FIELD_INCLUDE_EDIT = new java.util.ArrayList<String>();
+    static List<String> FIELD_EXCLUDE_LIST = new java.util.ArrayList<String>();
+    static List<String> FIELD_INCLUDE_LIST = new java.util.ArrayList<String>();
 
     static RulesFacade _instance;
 
@@ -34,7 +34,7 @@ public class RulesFacade {
 
     public RulesFacade() {
     	FIELD_EXCLUDE_CREATE.addAll(Arrays.asList("id", "version","dateCreated", "lastUpdated"));
-    	//FIELD_INCLUDE_CREATE
+    	FIELD_INCLUDE_CREATE.addAll(Arrays.asList("version"));
     	FIELD_EXCLUDE_EDIT.addAll(Arrays.asList("dateCreated", "lastUpdated"));
     	FIELD_INCLUDE_EDIT.addAll(Arrays.asList("id", "version"));
     	FIELD_EXCLUDE_LIST.addAll(Arrays.asList("dateCreated", "lastUpdated"));

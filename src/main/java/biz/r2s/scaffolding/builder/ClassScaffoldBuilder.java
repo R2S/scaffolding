@@ -1,25 +1,24 @@
 package biz.r2s.scaffolding.builder;
 
-import  biz.r2s.scaffolding.extractor.clazz.ClazzExtractor;
-import biz.r2s.scaffolding.extractor.json.JSONExtractor;
-import  biz.r2s.scaffolding.extractor.scaffolding.ScaffoldingExtractor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import biz.r2s.scaffolding.extractor.MetaDomainExtractor;
 import  biz.r2s.scaffolding.meta.ClassScaffold;
 
 /**
  * Created by raphael on 28/07/15.
  */
 public class ClassScaffoldBuilder {
-    private ClazzExtractor clazzExtractor;
-    private ScaffoldingExtractor scaffoldingExtractor;
-    private JSONExtractor jsonExtractor;
+	private static List<MetaDomainExtractor> domainExtractors = new ArrayList<MetaDomainExtractor>();
+	
+	public static void setDomainExtractor(MetaDomainExtractor domainExtractor) {
+		domainExtractors.add(domainExtractor);
+	}
+	
     private static ClassScaffoldBuilder _instance;
-
-
-    public ClassScaffoldBuilder() {
-        this.clazzExtractor = new ClazzExtractor();
-        this.scaffoldingExtractor = new ScaffoldingExtractor();
-        this.jsonExtractor = new JSONExtractor();
-    }
 
     public static ClassScaffoldBuilder getInstance() {
         if (_instance==null) {
@@ -32,23 +31,18 @@ public class ClassScaffoldBuilder {
     }
 
     public ClassScaffold builder(Class domainClass, boolean isHasMany) {
-        ClassScaffold classScaffol = new ClassScaffold();
-        classScaffol.setHasMany(isHasMany);
-        this.popularMetaByClass(domainClass, classScaffol);
-        this.popularMetaByScaffold(domainClass, classScaffol);
-        this.popularMetaByJSON(domainClass, classScaffol);
-        return classScaffol;
-    }
-
-    private void popularMetaByClass(Class domainClass, ClassScaffold classScaffold) {
-        clazzExtractor.extractor(domainClass, classScaffold);
-    }
-
-    private void popularMetaByScaffold(Class domainClass, ClassScaffold classScaffold) {
-        scaffoldingExtractor.extractor(domainClass, classScaffold);
-    }
-    
-    private void popularMetaByJSON(Class domainClass, ClassScaffold classScaffold) {
-    	jsonExtractor.extractor(domainClass, classScaffold);
+        ClassScaffold classScaffold = new ClassScaffold();
+        classScaffold.setHasMany(isHasMany);
+        Collections.sort(domainExtractors, new Comparator<MetaDomainExtractor>() {
+			@Override
+			public int compare(MetaDomainExtractor o1, MetaDomainExtractor o2) {
+				return Integer.compare(o1.getOrder(), o2.getOrder());
+			}
+        	 
+		});
+        for(MetaDomainExtractor domainExtractor:domainExtractors){
+        	domainExtractor.extractor(domainClass, classScaffold);
+        }
+        return classScaffold;
     }
 }

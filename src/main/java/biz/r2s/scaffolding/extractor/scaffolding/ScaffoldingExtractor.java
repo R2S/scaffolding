@@ -156,4 +156,9 @@ public class ScaffoldingExtractor implements MetaDomainExtractor {
 	void changeMenu(Map classScaffolding, ClassScaffold classScaffold){
         menuScaffoldingExtrator.changeMenu(classScaffolding, classScaffold);
     }
+
+	@Override
+	public int getOrder() {
+		return 1;
+	}
 }

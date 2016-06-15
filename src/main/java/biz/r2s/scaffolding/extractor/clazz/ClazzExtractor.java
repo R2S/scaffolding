@@ -68,4 +68,9 @@ public class ClazzExtractor implements MetaDomainExtractor {
     MenuScaffold getMenu(Class domainClass, ClassScaffold classScaffold){
         return menuClassExtrator.getMenu(domainClass);
     }
+
+	@Override
+	public int getOrder() {
+		return 0;
+	}
 }

@@ -44,4 +44,9 @@ public class JSONExtractor extends ScaffoldingExtractor{
 	public Object getConfig(Class domainClass){
 		return this.getConfigScaffoldind(domainClass);
 	}
+	
+	@Override
+	public int getOrder() {
+		return 2;
+	}
 }
