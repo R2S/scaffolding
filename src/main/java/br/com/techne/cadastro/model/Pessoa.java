@@ -3,15 +3,22 @@ package br.com.techne.cadastro.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Version;
 
 import biz.r2s.core.crud.model.BaseModel;
+import biz.r2s.scaffolding.annotation.MenuScaffold;
+import biz.r2s.scaffolding.annotation.Scaffolding;
 
 @Entity
+@Scaffolding
+@MenuScaffold(key = "", root = "")
 public class Pessoa implements BaseModel<Long> {
 	@Id
 	@GeneratedValue
 	private Long id;
 	private String nome;
+	@Version
+	private Long version;
 	private String cpf;
 	private int idade;
 	public Long getId() {
